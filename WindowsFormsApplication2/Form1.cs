@@ -2074,5 +2074,608 @@ namespace Dual_RS232_terminal
                 this.serialPort4.PinChanged -= this.serialPort4_PinChanged;
             }
         }
+
+        void SerialPopulate()
+        {
+            comboBox_portname1.Items.Clear();
+            comboBox_handshake1.Items.Clear();
+            comboBox_parity1.Items.Clear();
+            comboBox_stopbits1.Items.Clear();
+
+            comboBox_portname2.Items.Clear();
+            comboBox_handshake2.Items.Clear();
+            comboBox_parity2.Items.Clear();
+            comboBox_stopbits2.Items.Clear();
+
+            comboBox_portname3.Items.Clear();
+            comboBox_handshake3.Items.Clear();
+            comboBox_parity3.Items.Clear();
+            comboBox_stopbits3.Items.Clear();
+
+            comboBox_portname4.Items.Clear();
+            comboBox_handshake4.Items.Clear();
+            comboBox_parity4.Items.Clear();
+            comboBox_stopbits4.Items.Clear();
+
+            //Serial settings populate
+            comboBox_portname1.Items.Add("-None-");
+            comboBox_portname2.Items.Add("-None-");
+            comboBox_portname3.Items.Add("-None-");
+            comboBox_portname4.Items.Add("-None-");
+
+            //Add ports
+            foreach (string s in SerialPort.GetPortNames())
+            {
+                comboBox_portname1.Items.Add(s);
+                comboBox_portname2.Items.Add(s);
+                comboBox_portname3.Items.Add(s);
+                comboBox_portname4.Items.Add(s);
+            }
+            //Add handshake methods
+            foreach (string s in Enum.GetNames(typeof(Handshake)))
+            {
+                comboBox_handshake1.Items.Add(s);
+                comboBox_handshake2.Items.Add(s);
+                comboBox_handshake3.Items.Add(s);
+                comboBox_handshake4.Items.Add(s);
+            }
+            //Add parity
+            foreach (string s in Enum.GetNames(typeof(Parity)))
+            {
+                comboBox_parity1.Items.Add(s);
+                comboBox_parity2.Items.Add(s);
+                comboBox_parity3.Items.Add(s);
+                comboBox_parity4.Items.Add(s);
+            }
+            //Add stopbits
+            foreach (string s in Enum.GetNames(typeof(StopBits)))
+            {
+                comboBox_stopbits1.Items.Add(s);
+                comboBox_stopbits2.Items.Add(s);
+                comboBox_stopbits3.Items.Add(s);
+                comboBox_stopbits4.Items.Add(s);
+            }
+
+            if (comboBox_portname1.Items.Count > 1)
+            {
+                comboBox_portname1.SelectedIndex = 1;
+                comboBox_portspeed1.SelectedIndex = 0;
+                comboBox_handshake1.SelectedIndex = 0;
+                comboBox_databits1.SelectedIndex = 0;
+                comboBox_parity1.SelectedIndex = 2;
+                comboBox_stopbits1.SelectedIndex = 1;
+                checkBox_sendPort1.Enabled = true;
+                checkBox_displayPort1hex.Enabled = true;
+            }
+            else
+            {
+                comboBox_portname1.SelectedIndex = 0;
+                checkBox_sendPort1.Enabled = false;
+                checkBox_displayPort1hex.Enabled = false;
+            }
+
+            if (comboBox_portname2.Items.Count > 2)
+            {
+                comboBox_portname2.SelectedIndex = 2;
+                comboBox_portspeed2.SelectedIndex = 0;
+                comboBox_handshake2.SelectedIndex = 0;
+                comboBox_databits2.SelectedIndex = 0;
+                comboBox_parity2.SelectedIndex = 2;
+                comboBox_stopbits2.SelectedIndex = 1;
+                checkBox_sendPort2.Enabled = true;
+                checkBox_displayPort2hex.Enabled = true;
+            }
+            else
+            {
+                comboBox_portname2.SelectedIndex = 0;
+                checkBox_sendPort2.Enabled = false;
+                checkBox_displayPort2hex.Enabled = false;
+            }
+
+            if (comboBox_portname3.Items.Count > 3)
+            {
+                comboBox_portname3.SelectedIndex = 3;
+                comboBox_portspeed3.SelectedIndex = 0;
+                comboBox_handshake3.SelectedIndex = 0;
+                comboBox_databits3.SelectedIndex = 0;
+                comboBox_parity3.SelectedIndex = 2;
+                comboBox_stopbits3.SelectedIndex = 1;
+                checkBox_sendPort3.Enabled = true;
+                checkBox_displayPort3hex.Enabled = true;
+            }
+            else
+            {
+                comboBox_portname3.SelectedIndex = 0;
+                checkBox_sendPort3.Enabled = false;
+                checkBox_displayPort3hex.Enabled = false;
+            }
+
+            if (comboBox_portname4.Items.Count > 4)
+            {
+                comboBox_portname4.SelectedIndex = 4;
+                comboBox_portspeed4.SelectedIndex = 0;
+                comboBox_handshake4.SelectedIndex = 0;
+                comboBox_databits4.SelectedIndex = 0;
+                comboBox_parity4.SelectedIndex = 2;
+                comboBox_stopbits4.SelectedIndex = 1;
+                checkBox_sendPort4.Enabled = true;
+                checkBox_displayPort4hex.Enabled = true;
+            }
+            else
+            {
+                comboBox_portname4.SelectedIndex = 0;
+                checkBox_sendPort4.Enabled = false;
+                checkBox_displayPort4hex.Enabled = false;
+            }
+
+            if (comboBox_portname1.SelectedIndex == 0 && comboBox_portname2.SelectedIndex == 0 && comboBox_portname3.SelectedIndex == 0 && comboBox_portname4.SelectedIndex == 0) button_openport.Enabled = false;
+            else button_openport.Enabled = true;
+            checkBox_portName_CheckedChanged(this, EventArgs.Empty);
+        }
+
+        delegate void SetTextCallback1(string text);
+        private void SetText(string text)
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            //if (this.textBox_terminal1.InvokeRequired)
+            if (this.textBox_terminal1.InvokeRequired)
+            {
+                SetTextCallback1 d = new SetTextCallback1(SetText);
+                this.BeginInvoke(d, new object[] { text });
+            }
+            else
+            {
+                //this.textBox_terminal1.Text += text;
+                this.textBox_terminal1.SelectionStart = this.textBox_terminal1.TextLength;
+                this.textBox_terminal1.SelectedText = text;
+            }
+        }
+
+        public static string ConvertStringToHex(string utfString)
+        {
+            byte[] encodedBytes = System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetBytes(utfString);
+            string hexStr = "";
+            foreach (System.Char c in encodedBytes)
+            {
+                hexStr += ((int)c).ToString("X2") + " ";
+            }
+            return hexStr;
+        }
+
+        public static string ConvertByteArrToHex(byte[] byteArr, int arrLength)
+        {
+            string hexStr = "";
+            int i = 0;
+            for (i = 0; i < arrLength; i++)
+            {
+                hexStr += byteArr[i].ToString("X2") + " ";
+            }
+            return hexStr;
+        }
+
+        public static string ConvertHexToString(string hexString)
+        {
+            hexString = hexString.Replace(" ", "");
+            if (hexString.Length % 2 == 1) hexString = hexString + "0";
+            byte[] StrValue = new byte[hexString.Length / 2];
+            int i = 0;
+            while (hexString.Length > 1)
+            {
+                StrValue[i] = System.Convert.ToByte(System.Convert.ToUInt32(hexString.Substring(0, 2), 16));
+                hexString = hexString.Substring(2, hexString.Length - 2);
+                i++;
+            }
+            return System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(StrValue, 0, i);
+        }
+
+        public static byte[] ConvertHexToByte(string hexString)
+        {
+            hexString = hexString.Replace(" ", "");
+            if (hexString.Length % 2 == 1) hexString = hexString + "0";
+            byte[] byteValue = new byte[hexString.Length / 2];
+            int i = 0;
+            while (hexString.Length > 1)
+            {
+                byteValue[i] = System.Convert.ToByte(System.Convert.ToUInt32(hexString.Substring(0, 2), 16));
+                hexString = hexString.Substring(2, hexString.Length - 2);
+                i++;
+            }
+            return byteValue;
+        }
+
+        string checkHexString(string inStr)
+        {
+            string outStr = "";
+            if (inStr != "")
+            {
+                char[] str = inStr.ToCharArray(0, inStr.Length);
+                string tmpStr = "";
+                for (int i = 0; i < inStr.Length; i++)
+                {
+                    if ((str[i] >= 'A' && str[i] <= 'F') || (str[i] >= 'a' && str[i] <= 'f') || (str[i] >= '0' && str[i] <= '9'))
+                    {
+                        tmpStr += str[i].ToString();
+                    }
+                    else if (str[i] == ' ' && tmpStr.Length > 0)
+                    {
+                        for (int i1 = 0; i1 < 2 - tmpStr.Length; i1++) outStr += "0";
+                        outStr += tmpStr + " ";
+                        tmpStr = "";
+                    }
+                    if (tmpStr.Length == 2)
+                    {
+                        outStr += tmpStr + " ";
+                        tmpStr = "";
+                    }
+                }
+                if (tmpStr != "")
+                {
+                    for (int i = 0; i < 2 - tmpStr.Length; i++) outStr += "0";
+                    outStr += tmpStr + " ";
+                }
+                return outStr.ToUpperInvariant();
+            }
+            else return ("");
+        }
+
+        void SendStringCollect()
+        {
+            string tmpStr;
+            if (checkBox_commandhex.Checked == true) tmpStr = textBox_command.Text.Trim();
+            else tmpStr = ConvertStringToHex(textBox_command.Text).Trim();
+            if (checkBox_paramhex.Checked == true) tmpStr += " " + textBox_params.Text.Trim();
+            else tmpStr += " " + ConvertStringToHex(textBox_params.Text).Trim();
+            if (checkBox_cr.Checked == true) tmpStr += " 0D";
+            if (checkBox_lf.Checked == true) tmpStr += " 0A";
+            if (checkBox_suff.Checked == true)
+            {
+                if (checkBox_suffhex.Checked == true) tmpStr += " " + textBox_suff.Text.Trim();
+                else tmpStr += " " + ConvertStringToHex(textBox_suff.Text).Trim();
+            }
+            textBox_senddata.Text = checkHexString(tmpStr);
+        }
+
+        private object threadLock = new object();
+        public void collectBuffer(string tmpBuffer, int state, string time)
+        {
+            if (tmpBuffer != "")
+            {
+                lock (threadLock)
+                {
+                    if (!(txtOutState == state && (DateTime.Now.Ticks - oldTicks) < limitTick && state != Port1DataOut && state != Port2DataOut && state != Port3DataOut && state != Port4DataOut))
+                    {
+                        if (state == Port1DataIn)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname1 + "<< " + tmpBuffer;
+                        }
+                        else if (state == Port1DataOut)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname1 + ">> " + tmpBuffer;
+                        }
+                        else if (state == Port1SignalIn)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname1 + "<< " + tmpBuffer;
+                        }
+                        else if (state == Port1SignalOut)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname1 + ">> " + tmpBuffer;
+                        }
+                        else if (state == Port1Error)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname1 + tmpBuffer;
+                        }
+
+                        else if (state == Port2DataIn)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname2 + "<< " + tmpBuffer;
+                        }
+                        else if (state == Port2DataOut)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname2 + ">> " + tmpBuffer;
+                        }
+                        else if (state == Port2SignalIn)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname2 + "<< " + tmpBuffer;
+                        }
+                        else if (state == Port2SignalOut)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname2 + ">> " + tmpBuffer;
+                        }
+                        else if (state == Port2Error)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname2 + tmpBuffer;
+                        }
+
+                        else if (state == Port3DataIn)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname3 + "<< " + tmpBuffer;
+                        }
+                        else if (state == Port3DataOut)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname3 + ">> " + tmpBuffer;
+                        }
+                        else if (state == Port3SignalIn)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname3 + "<< " + tmpBuffer;
+                        }
+                        else if (state == Port3SignalOut)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname3 + ">> " + tmpBuffer;
+                        }
+                        else if (state == Port3Error)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname3 + tmpBuffer;
+                        }
+
+                        else if (state == Port4DataIn)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname4 + "<< " + tmpBuffer;
+                        }
+                        else if (state == Port4DataOut)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname4 + ">> " + tmpBuffer;
+                        }
+                        else if (state == Port4SignalIn)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname4 + "<< " + tmpBuffer;
+                        }
+                        else if (state == Port4SignalOut)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname4 + ">> " + tmpBuffer;
+                        }
+                        else if (state == Port4Error)
+                        {
+                            if (checkBox_insDir.Checked == true) tmpBuffer = portname4 + tmpBuffer;
+                        }
+
+                        if (checkBox_insTime.Checked == true) tmpBuffer = time + " " + tmpBuffer;
+                        tmpBuffer = "\r\n" + tmpBuffer;
+                        txtOutState = state;
+                    }
+                    if (autosaveTXTToolStripMenuItem1.Checked == true)
+                    {
+                        try
+                        {
+                            File.AppendAllText(terminaltxtToolStripMenuItem1.Text, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("\r\nError opening file " + terminaltxtToolStripMenuItem1.Text + ": " + ex.Message);
+                        }
+                    }
+                    if (logToTextToolStripMenuItem.Checked == true) SetText(tmpBuffer);
+                    oldTicks = DateTime.Now.Ticks;
+                }
+            }
+        }
+        public void CSVcollectBuffer(string tmpBuffer)
+        {
+            if (tmpBuffer != "")
+            {
+                lock (threadLock)
+                {
+
+                    try
+                    {
+                        File.AppendAllText(terminalcsvToolStripMenuItem1.Text, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
+                    }
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show("\r\nError opening file " + terminalcsvToolStripMenuItem1.Text + ": " + ex.Message);
+                    }
+                }
+            }
+        }
+        public void CSVcollectGrid(DataRow tmpDataRow)
+        {
+            lock (threadLock)
+            {
+                /*DataRow dataRowIN = null;
+                dataRowIN = CSVdataTable.NewRow();
+                dataRowIN = tmpDataRow;
+                CSVdataTable.Rows.Add(dataRowIN);*/
+                CSVdataTable.Rows.Add(tmpDataRow);
+            }
+        }
+
+        delegate void SetPinCallback1(bool setPin);
+        private void SetPinCD1(bool setPin)
+        {
+            if (this.checkBox_CD1.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinCD1);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_CD1.Checked = setPin;
+            }
+        }
+        private void SetPinDSR1(bool setPin)
+        {
+            if (this.checkBox_DSR1.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinDSR1);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_DSR1.Checked = setPin;
+            }
+        }
+        private void SetPinCTS1(bool setPin)
+        {
+            if (this.checkBox_CTS1.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinCTS1);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_CTS1.Checked = setPin;
+            }
+        }
+        private void SetPinRING1(bool setPin)
+        {
+            if (this.checkBox_RI1.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinRING1);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_RI1.Checked = setPin;
+            }
+        }
+
+        private void SetPinCD2(bool setPin)
+        {
+            if (this.checkBox_CD2.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinCD2);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_CD2.Checked = setPin;
+            }
+        }
+        private void SetPinDSR2(bool setPin)
+        {
+            if (this.checkBox_DSR2.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinDSR2);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_DSR2.Checked = setPin;
+            }
+        }
+        private void SetPinCTS2(bool setPin)
+        {
+            if (this.checkBox_CTS2.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinCTS2);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_CTS2.Checked = setPin;
+            }
+        }
+        private void SetPinRING2(bool setPin)
+        {
+            if (this.checkBox_RI2.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinRING2);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_RI2.Checked = setPin;
+            }
+        }
+
+        private void SetPinCD3(bool setPin)
+        {
+            if (this.checkBox_CD3.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinCD3);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_CD3.Checked = setPin;
+            }
+        }
+        private void SetPinDSR3(bool setPin)
+        {
+            if (this.checkBox_DSR3.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinDSR3);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_DSR3.Checked = setPin;
+            }
+        }
+        private void SetPinCTS3(bool setPin)
+        {
+            if (this.checkBox_CTS3.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinCTS3);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_CTS3.Checked = setPin;
+            }
+        }
+        private void SetPinRING3(bool setPin)
+        {
+            if (this.checkBox_RI3.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinRING3);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_RI3.Checked = setPin;
+            }
+        }
+
+        private void SetPinCD4(bool setPin)
+        {
+            if (this.checkBox_CD4.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinCD4);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_CD4.Checked = setPin;
+            }
+        }
+        private void SetPinDSR4(bool setPin)
+        {
+            if (this.checkBox_DSR4.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinDSR4);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_DSR4.Checked = setPin;
+            }
+        }
+        private void SetPinCTS4(bool setPin)
+        {
+            if (this.checkBox_CTS4.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinCTS4);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_CTS4.Checked = setPin;
+            }
+        }
+        private void SetPinRING4(bool setPin)
+        {
+            if (this.checkBox_RI4.InvokeRequired)
+            {
+                SetPinCallback1 d = new SetPinCallback1(SetPinRING4);
+                this.BeginInvoke(d, new object[] { setPin });
+            }
+            else
+            {
+                this.checkBox_RI4.Checked = setPin;
+            }
+        }
+
     }
 }
