@@ -6,7 +6,7 @@ T-cable drawing attached is the way to collect 2-way data from any RS232 connect
 Take care of sorting data by time because Windows is not a real-time OS and data chunks can be mixed while saving them in the file even being captured correctly. Timestamps helps to keep the timeline correct.
 User can disable log output to textbox and grid table to reduce CPU load. Also RS232 signals monitoring (DCD, RTS, CTS, DTR, DSR) can be disabled in settings.
 See .config files for some system-related settings.
-
+----
 Real world example: analyze behavior of PC-fiscal controller-printer system. One needs to monitor:
   1) Commands PC -> Fiscal
   2) Replies Fiscal -> PC
