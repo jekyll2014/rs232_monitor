@@ -12,6 +12,7 @@ Real world example: analyze behavior of PC-fiscal controller-printer system. One
   2) Replies Fiscal -> PC
   3) Commands Fiscal -> Printer
   4) Replies Printer -> Fiscal
-Take 2 T-cables? connect them between PC and Fiscal and Fiscal and Printer. Connect T-cables to monitoring PC via USB hub+4xUSB-COM adapters. Run the software and get the data.
+  
+  Take 2 T-cables? connect them between PC and Fiscal and Fiscal and Printer. Connect T-cables to monitoring PC via USB hub+4xUSB-COM adapters. Run the software and get the data.
 Load it into Open/LibreOffice Calc via CSV and sort by Time+milliseconds columns to be sure it's ordered. Now data can be filtered by source port and other parameters to be analyzed.
 Extracted command data can be sent to device with ComPrnControl or UsbPrnControl to replay or analyzed with EscPosParser2.
