@@ -7,7 +7,7 @@ Take care of sorting data by time because Windows is not a real-time OS and data
 User can disable log output to textbox and grid table to reduce CPU load. Also RS232 signals monitoring (DCD, RTS, CTS, DTR, DSR) can be disabled in settings.
 See .config files for some system-related settings.
 
-Real world example: analyse behavior of PC-fiscal controller-printer system. One needs to monitor:
+Real world example: analyze behavior of PC-fiscal controller-printer system. One needs to monitor:
   1) Commands PC -> Fiscal
   2) Replies Fiscal -> PC
   3) Commands Fiscal -> Printer
