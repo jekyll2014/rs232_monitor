@@ -5,7 +5,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Text;
 using System.Windows.Forms;
-namespace Dual_RS232_terminal
+namespace RS232_monitor
 {
     partial class FormMain
     {
@@ -540,8 +540,6 @@ namespace Dual_RS232_terminal
             // serialPort2
             // 
             this.serialPort2.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort2_ErrorReceived);
-            this.serialPort2.PinChanged += new System.IO.Ports.SerialPinChangedEventHandler(this.serialPort2_PinChanged);
-            this.serialPort2.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort2_DataReceived);
             // 
             // checkBox_sendPort1
             // 
@@ -790,11 +788,13 @@ namespace Dual_RS232_terminal
             this.checkBox_insPin.TabIndex = 0;
             this.checkBox_insPin.Text = "signal status";
             this.checkBox_insPin.UseVisualStyleBackColor = true;
+            this.checkBox_insPin.CheckedChanged += new System.EventHandler(this.checkBox_insPin_CheckedChanged);
             // 
             // checkBox_insTime
             // 
             this.checkBox_insTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox_insTime.AutoSize = true;
+            this.checkBox_insTime.BackColor = System.Drawing.SystemColors.ControlLight;
             this.checkBox_insTime.Checked = true;
             this.checkBox_insTime.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_insTime.Location = new System.Drawing.Point(129, 19);
@@ -802,7 +802,7 @@ namespace Dual_RS232_terminal
             this.checkBox_insTime.Size = new System.Drawing.Size(45, 17);
             this.checkBox_insTime.TabIndex = 2;
             this.checkBox_insTime.Text = "time";
-            this.checkBox_insTime.UseVisualStyleBackColor = true;
+            this.checkBox_insTime.UseVisualStyleBackColor = false;
             // 
             // checkBox_displayPort1hex
             // 
@@ -911,8 +911,6 @@ namespace Dual_RS232_terminal
             // serialPort1
             // 
             this.serialPort1.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort1_ErrorReceived);
-            this.serialPort1.PinChanged += new System.IO.Ports.SerialPinChangedEventHandler(this.serialPort1_PinChanged);
-            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
             // dataGridView
             // 
@@ -1888,14 +1886,10 @@ namespace Dual_RS232_terminal
             // serialPort3
             // 
             this.serialPort3.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort3_ErrorReceived);
-            this.serialPort3.PinChanged += new System.IO.Ports.SerialPinChangedEventHandler(this.serialPort3_PinChanged);
-            this.serialPort3.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort3_DataReceived);
             // 
             // serialPort4
             // 
             this.serialPort4.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort4_ErrorReceived);
-            this.serialPort4.PinChanged += new System.IO.Ports.SerialPinChangedEventHandler(this.serialPort4_PinChanged);
-            this.serialPort4.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort4_DataReceived);
             // 
             // FormMain
             // 
@@ -2113,71 +2107,5 @@ namespace Dual_RS232_terminal
         private SerialPort serialPort4;
         private ToolStripMenuItem logToTextToolStripMenuItem;
         private ToolStripMenuItem toolStripMenuItem_onlyData;
-
-        bool o_cd1, o_dsr1, o_dtr1, o_rts1, o_cts1;
-        bool o_cd2, o_dsr2, o_dtr2, o_rts2, o_cts2;
-        bool o_cd3, o_dsr3, o_dtr3, o_rts3, o_cts3;
-        bool o_cd4, o_dsr4, o_dtr4, o_rts4, o_cts4;
-        public System.Data.DataTable CSVdataTable = new System.Data.DataTable("Logs");
-        string portname1, portname2, portname3, portname4;
-        int txtOutState = 0;
-        long oldTicks = DateTime.Now.Ticks, limitTick = 0;
-
-        /*
-        Codepages list https://msdn.microsoft.com/en-us/library/system.text.encoding(v=vs.110).aspx
-        const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
-        */
-
-        public const byte Port1DataIn = 11;
-        public const byte Port1DataOut = 12;
-        public const byte Port1SignalIn = 13;
-        public const byte Port1SignalOut = 14;
-        public const byte Port1Error = 15;
-
-        public const byte Port2DataIn = 21;
-        public const byte Port2DataOut = 22;
-        public const byte Port2SignalIn = 23;
-        public const byte Port2SignalOut = 24;
-        public const byte Port2Error = 25;
-
-        public const byte Port3DataIn = 31;
-        public const byte Port3DataOut = 32;
-        public const byte Port3SignalIn = 33;
-        public const byte Port3SignalOut = 34;
-        public const byte Port3Error = 35;
-
-        public const byte Port4DataIn = 41;
-        public const byte Port4DataOut = 42;
-        public const byte Port4SignalIn = 43;
-        public const byte Port4SignalOut = 44;
-        public const byte Port4Error = 45;
-
-
-        /*
-         *      byte[] buffer = new byte[MAX_RECEIVE_BUFFER * 3];
-                Action kickoffRead = null;
-                kickoffRead = delegate
-                {
-                    _serialPort.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
-                    {
-                        try
-                        {
-                            int bytesRead = _serialPort.BaseStream.EndRead(ar);
-                            byte[] received = new byte[bytesRead];
-                            Buffer.BlockCopy(buffer, 0, received, 0, bytesRead);
-                            lock (_receiveBuffer)
-                            {
-                                _receiveBuffer.AddRange(received);
-                            }
-                            received = null; // Resetting this has no effect, but left in to rule it out.
-                        }
-                        catch (IOException) { }
-                        kickoffRead();
-                    },
-                    null);
-                };
-                kickoffRead();
-        */
-
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Dual_RS232_terminal
+namespace RS232_monitor
 {
     static class Program
     {

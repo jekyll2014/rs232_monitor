@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -8,10 +9,47 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Dual_RS232_terminal
+namespace RS232_monitor
 {
     public partial class FormMain : Form
     {
+        /*
+Codepages list https://msdn.microsoft.com/en-us/library/system.text.encoding(v=vs.110).aspx
+const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
+*/
+        bool o_cd1, o_dsr1, o_dtr1, o_rts1, o_cts1;
+        bool o_cd2, o_dsr2, o_dtr2, o_rts2, o_cts2;
+        bool o_cd3, o_dsr3, o_dtr3, o_rts3, o_cts3;
+        bool o_cd4, o_dsr4, o_dtr4, o_rts4, o_cts4;
+        public System.Data.DataTable CSVdataTable = new System.Data.DataTable("Logs");
+        string portname1, portname2, portname3, portname4;
+        int txtOutState = 0;
+        long oldTicks = DateTime.Now.Ticks, limitTick = 0;
+
+        public const byte Port1DataIn = 11;
+        public const byte Port1DataOut = 12;
+        public const byte Port1SignalIn = 13;
+        public const byte Port1SignalOut = 14;
+        public const byte Port1Error = 15;
+
+        public const byte Port2DataIn = 21;
+        public const byte Port2DataOut = 22;
+        public const byte Port2SignalIn = 23;
+        public const byte Port2SignalOut = 24;
+        public const byte Port2Error = 25;
+
+        public const byte Port3DataIn = 31;
+        public const byte Port3DataOut = 32;
+        public const byte Port3SignalIn = 33;
+        public const byte Port3SignalOut = 34;
+        public const byte Port3Error = 35;
+
+        public const byte Port4DataIn = 41;
+        public const byte Port4DataOut = 42;
+        public const byte Port4SignalIn = 43;
+        public const byte Port4SignalOut = 44;
+        public const byte Port4Error = 45;
+
         public FormMain()
         {
             InitializeComponent();
@@ -181,6 +219,7 @@ namespace Dual_RS232_terminal
                 serialPort1.StopBits = (StopBits)Enum.Parse(typeof(StopBits), comboBox_stopbits1.Text);
                 serialPort1.ReadTimeout = RS232_monitor.Properties.Settings.Default.ReceiveTimeOut;
                 serialPort1.WriteTimeout = RS232_monitor.Properties.Settings.Default.SendTimeOut;
+                serialPort1.ReadBufferSize = 8192;
                 try
                 {
                     serialPort1.Open();
@@ -218,6 +257,8 @@ namespace Dual_RS232_terminal
 
                     return;
                 }
+                if (checkBox_insPin.Checked) this.serialPort1.PinChanged += this.serialPort1_PinChanged;
+                this.serialPort1.DataReceived += this.serialPort1_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -280,6 +321,7 @@ namespace Dual_RS232_terminal
                 serialPort2.StopBits = (StopBits)Enum.Parse(typeof(StopBits), comboBox_stopbits2.Text);
                 serialPort2.ReadTimeout = RS232_monitor.Properties.Settings.Default.ReceiveTimeOut;
                 serialPort2.WriteTimeout = RS232_monitor.Properties.Settings.Default.SendTimeOut;
+                serialPort2.ReadBufferSize = 8192;
                 try
                 {
                     serialPort2.Open();
@@ -316,6 +358,8 @@ namespace Dual_RS232_terminal
                     comboBox_stopbits4.Enabled = true;
                     return;
                 }
+                if (checkBox_insPin.Checked) this.serialPort2.PinChanged += this.serialPort2_PinChanged;
+                this.serialPort2.DataReceived += this.serialPort2_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -377,6 +421,7 @@ namespace Dual_RS232_terminal
                 serialPort3.StopBits = (StopBits)Enum.Parse(typeof(StopBits), comboBox_stopbits3.Text);
                 serialPort3.ReadTimeout = RS232_monitor.Properties.Settings.Default.ReceiveTimeOut;
                 serialPort3.WriteTimeout = RS232_monitor.Properties.Settings.Default.SendTimeOut;
+                serialPort3.ReadBufferSize = 8192;
                 try
                 {
                     serialPort3.Open();
@@ -413,6 +458,8 @@ namespace Dual_RS232_terminal
                     comboBox_stopbits4.Enabled = true;
                     return;
                 }
+                if (checkBox_insPin.Checked) this.serialPort3.PinChanged += this.serialPort3_PinChanged;
+                this.serialPort3.DataReceived += this.serialPort3_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -474,6 +521,7 @@ namespace Dual_RS232_terminal
                 serialPort4.StopBits = (StopBits)Enum.Parse(typeof(StopBits), comboBox_stopbits4.Text);
                 serialPort4.ReadTimeout = RS232_monitor.Properties.Settings.Default.ReceiveTimeOut;
                 serialPort4.WriteTimeout = RS232_monitor.Properties.Settings.Default.SendTimeOut;
+                serialPort4.ReadBufferSize = 8192;
                 try
                 {
                     serialPort4.Open();
@@ -510,6 +558,8 @@ namespace Dual_RS232_terminal
                     comboBox_stopbits4.Enabled = true;
                     return;
                 }
+                if (checkBox_insPin.Checked) this.serialPort4.PinChanged += this.serialPort4_PinChanged;
+                this.serialPort4.DataReceived += this.serialPort4_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -573,6 +623,15 @@ namespace Dual_RS232_terminal
             {
                 MessageBox.Show("Error closing port " + serialPort4.PortName + ": " + ex.Message);
             }
+            serialPort1.DataReceived -= serialPort1_DataReceived;
+            serialPort1.PinChanged -= serialPort1_PinChanged;
+            serialPort2.DataReceived -= serialPort2_DataReceived;
+            serialPort2.PinChanged -= serialPort2_PinChanged;
+            serialPort3.DataReceived -= serialPort3_DataReceived;
+            serialPort3.PinChanged -= serialPort3_PinChanged;
+            serialPort4.DataReceived -= serialPort4_DataReceived;
+            serialPort4.PinChanged -= serialPort4_PinChanged;
+
             comboBox_portname1.Enabled = true;
             comboBox_portspeed1.Enabled = true;
             comboBox_handshake1.Enabled = true;
@@ -629,14 +688,21 @@ namespace Dual_RS232_terminal
                     DataRow dataRowTX1 = null;
                     //create new row in datatable
                     dataRowTX1 = CSVdataTable.NewRow();
-                    dataRowTX1["Date"] = DateTime.Today.ToShortDateString();
-                    dataRowTX1["Time"] = DateTime.Now.ToLongTimeString();
-                    dataRowTX1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-                    dataRowTX1["Port"] = portname1;
-                    dataRowTX1["Dir"] = "TX";
+                    if (checkBox_insTime.Checked)
+                    {
+                        dataRowTX1["Date"] = DateTime.Today.ToShortDateString();
+                        dataRowTX1["Time"] = DateTime.Now.ToLongTimeString();
+                        dataRowTX1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+                    }
+                    if (checkBox_insDir.Checked)
+                    {
+                        dataRowTX1["Port"] = portname1;
+                        dataRowTX1["Dir"] = "TX";
+                    }
+                    dataRowTX1["Mark"] = checkBox_Mark.Checked;
                     try
                     {
-                        serialPort1.Write(ConvertHexToByte(textBox_senddata.Text), 0, textBox_senddata.Text.Length / 3);
+                        serialPort1.Write(Accessory.ConvertHexToByteArray(textBox_senddata.Text), 0, textBox_senddata.Text.Length / 3);
                     }
                     catch (Exception ex)
                     {
@@ -644,29 +710,34 @@ namespace Dual_RS232_terminal
                         dataRowTX1["Signal"] = "Error sending to port " + serialPort1.PortName + ": " + ex.Message;
                     }
                     dataRowTX1["Data"] = textBox_senddata.Text;
-                    dataRowTX1["Mark"] = checkBox_Mark.Checked;
                     if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowTX1);
                     //if (checkBox_insTime.Checked == true) outStr += dataRowTX1["Date"] + " " + dataRowTX1["Time"] + "." + dataRowTX1["Milis"] + " ";
                     //if (checkBox_insDir.Checked == true) outStr += portname1 + ">> ";
                     if (checkBox_displayPort1hex.Checked == true) outStr += textBox_senddata.Text;
-                    else outStr += ConvertHexToString(textBox_senddata.Text);
+                    else outStr += Accessory.ConvertHexToString(textBox_senddata.Text);
                     if (outStr != "") collectBuffer(outStr, Port1DataOut, dataRowTX1["Date"] + " " + dataRowTX1["Time"] + "." + dataRowTX1["Milis"]);
                     if (autosaveCSVToolStripMenuItem1.Checked == true && dataRowTX1["Data"].ToString() != "") CSVcollectBuffer(dataRowTX1["Date"] + "," + dataRowTX1["Time"] + "," + dataRowTX1["Milis"] + "," + dataRowTX1["Port"] + "," + dataRowTX1["Dir"] + "," + dataRowTX1["Data"] + "," + dataRowTX1["Signal"] + "," + dataRowTX1["Mark"] + "\r\n");
                 }
-
                 if (checkBox_sendPort2.Checked == true && serialPort2.IsOpen)
                 {
                     DataRow dataRowTX2 = null;
                     //создаём новую строку
                     dataRowTX2 = CSVdataTable.NewRow();
-                    dataRowTX2["Date"] = DateTime.Today.ToShortDateString();
-                    dataRowTX2["Time"] = DateTime.Now.ToLongTimeString();
-                    dataRowTX2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-                    dataRowTX2["Port"] = portname2;
-                    dataRowTX2["Dir"] = "TX";
+                    if (checkBox_insTime.Checked)
+                    {
+                        dataRowTX2["Date"] = DateTime.Today.ToShortDateString();
+                        dataRowTX2["Time"] = DateTime.Now.ToLongTimeString();
+                        dataRowTX2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+                    }
+                    if (checkBox_insDir.Checked)
+                    {
+                        dataRowTX2["Port"] = portname2;
+                        dataRowTX2["Dir"] = "TX";
+                    }
+                    dataRowTX2["Mark"] = checkBox_Mark.Checked;
                     try
                     {
-                        serialPort2.Write(ConvertHexToByte(textBox_senddata.Text), 0, textBox_senddata.Text.Length / 3);
+                        serialPort2.Write(Accessory.ConvertHexToByteArray(textBox_senddata.Text), 0, textBox_senddata.Text.Length / 3);
                     }
                     catch (Exception ex)
                     {
@@ -675,30 +746,35 @@ namespace Dual_RS232_terminal
 
                     }
                     dataRowTX2["Data"] = textBox_senddata.Text;
-                    dataRowTX2["Mark"] = checkBox_Mark.Checked;
                     if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowTX2);
                     outStr = "";
                     //if (checkBox_insTime.Checked == true) outStr += dataRowTX2["Date"] + " " + dataRowTX2["Time"] + "." + dataRowTX2["Milis"] + " ";
                     //if (checkBox_insDir.Checked == true) outStr += portname2 + ">> ";
                     if (checkBox_displayPort2hex.Checked == true) outStr += textBox_senddata.Text;
-                    else outStr += ConvertHexToString(textBox_senddata.Text);
+                    else outStr += Accessory.ConvertHexToString(textBox_senddata.Text);
                     collectBuffer(outStr, Port2DataOut, dataRowTX2["Date"] + " " + dataRowTX2["Time"] + "." + dataRowTX2["Milis"]);
                     if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowTX2["Date"] + "," + dataRowTX2["Time"] + "," + dataRowTX2["Milis"] + "," + dataRowTX2["Port"] + "," + dataRowTX2["Dir"] + "," + dataRowTX2["Data"] + "," + dataRowTX2["Signal"] + "," + dataRowTX2["Mark"] + "\r\n");
                 }
-
                 if (checkBox_sendPort3.Checked == true && serialPort3.IsOpen)
                 {
                     DataRow dataRowTX3 = null;
                     //создаём новую строку
                     dataRowTX3 = CSVdataTable.NewRow();
-                    dataRowTX3["Date"] = DateTime.Today.ToShortDateString();
-                    dataRowTX3["Time"] = DateTime.Now.ToLongTimeString();
-                    dataRowTX3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-                    dataRowTX3["Port"] = portname3;
-                    dataRowTX3["Dir"] = "TX";
+                    if (checkBox_insTime.Checked)
+                    {
+                        dataRowTX3["Date"] = DateTime.Today.ToShortDateString();
+                        dataRowTX3["Time"] = DateTime.Now.ToLongTimeString();
+                        dataRowTX3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+                    }
+                    if (checkBox_insDir.Checked)
+                    {
+                        dataRowTX3["Port"] = portname3;
+                        dataRowTX3["Dir"] = "TX";
+                    }
+                    dataRowTX3["Mark"] = checkBox_Mark.Checked;
                     try
                     {
-                        serialPort3.Write(ConvertHexToByte(textBox_senddata.Text), 0, textBox_senddata.Text.Length / 3);
+                        serialPort3.Write(Accessory.ConvertHexToByteArray(textBox_senddata.Text), 0, textBox_senddata.Text.Length / 3);
                     }
                     catch (Exception ex)
                     {
@@ -707,30 +783,35 @@ namespace Dual_RS232_terminal
 
                     }
                     dataRowTX3["Data"] = textBox_senddata.Text;
-                    dataRowTX3["Mark"] = checkBox_Mark.Checked;
                     if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowTX3);
                     outStr = "";
                     //if (checkBox_insTime.Checked == true) outStr += dataRowTX2["Date"] + " " + dataRowTX2["Time"] + "." + dataRowTX2["Milis"] + " ";
                     //if (checkBox_insDir.Checked == true) outStr += portname2 + ">> ";
                     if (checkBox_displayPort3hex.Checked == true) outStr += textBox_senddata.Text;
-                    else outStr += ConvertHexToString(textBox_senddata.Text);
+                    else outStr += Accessory.ConvertHexToString(textBox_senddata.Text);
                     collectBuffer(outStr, Port3DataOut, dataRowTX3["Date"] + " " + dataRowTX3["Time"] + "." + dataRowTX3["Milis"]);
                     if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowTX3["Date"] + "," + dataRowTX3["Time"] + "," + dataRowTX3["Milis"] + "," + dataRowTX3["Port"] + "," + dataRowTX3["Dir"] + "," + dataRowTX3["Data"] + "," + dataRowTX3["Signal"] + "," + dataRowTX3["Mark"] + "\r\n");
                 }
-
                 if (checkBox_sendPort4.Checked == true && serialPort4.IsOpen)
                 {
                     DataRow dataRowTX4 = null;
                     //создаём новую строку
                     dataRowTX4 = CSVdataTable.NewRow();
-                    dataRowTX4["Date"] = DateTime.Today.ToShortDateString();
-                    dataRowTX4["Time"] = DateTime.Now.ToLongTimeString();
-                    dataRowTX4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-                    dataRowTX4["Port"] = portname4;
-                    dataRowTX4["Dir"] = "TX";
+                    if (checkBox_insTime.Checked)
+                    {
+                        dataRowTX4["Date"] = DateTime.Today.ToShortDateString();
+                        dataRowTX4["Time"] = DateTime.Now.ToLongTimeString();
+                        dataRowTX4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+                    }
+                    if (checkBox_insDir.Checked)
+                    {
+                        dataRowTX4["Port"] = portname4;
+                        dataRowTX4["Dir"] = "TX";
+                    }
+                    dataRowTX4["Mark"] = checkBox_Mark.Checked;
                     try
                     {
-                        serialPort4.Write(ConvertHexToByte(textBox_senddata.Text), 0, textBox_senddata.Text.Length / 3);
+                        serialPort4.Write(Accessory.ConvertHexToByteArray(textBox_senddata.Text), 0, textBox_senddata.Text.Length / 3);
                     }
                     catch (Exception ex)
                     {
@@ -739,13 +820,12 @@ namespace Dual_RS232_terminal
 
                     }
                     dataRowTX4["Data"] = textBox_senddata.Text;
-                    dataRowTX4["Mark"] = checkBox_Mark.Checked;
                     if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowTX4);
                     outStr = "";
                     //if (checkBox_insTime.Checked == true) outStr += dataRowTX2["Date"] + " " + dataRowTX2["Time"] + "." + dataRowTX2["Milis"] + " ";
                     //if (checkBox_insDir.Checked == true) outStr += portname2 + ">> ";
                     if (checkBox_displayPort4hex.Checked == true) outStr += textBox_senddata.Text;
-                    else outStr += ConvertHexToString(textBox_senddata.Text);
+                    else outStr += Accessory.ConvertHexToString(textBox_senddata.Text);
                     collectBuffer(outStr, Port4DataOut, dataRowTX4["Date"] + " " + dataRowTX4["Time"] + "." + dataRowTX4["Milis"]);
                     if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowTX4["Date"] + "," + dataRowTX4["Time"] + "," + dataRowTX4["Milis"] + "," + dataRowTX4["Port"] + "," + dataRowTX4["Dir"] + "," + dataRowTX4["Data"] + "," + dataRowTX4["Signal"] + "," + dataRowTX4["Mark"] + "\r\n");
                 }
@@ -754,172 +834,144 @@ namespace Dual_RS232_terminal
 
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            byte[] rx1 = new byte[RS232_monitor.Properties.Settings.Default.rxBuffer];
-            DataRow dataRowRX1 = null;
-            dataRowRX1 = CSVdataTable.NewRow();
-            dataRowRX1["Date"] = DateTime.Today.ToShortDateString();
-            dataRowRX1["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowRX1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowRX1["Port"] = portname1;
-            dataRowRX1["Dir"] = "RX";
-            dataRowRX1["Mark"] = checkBox_Mark.Checked;
-            int i = 0;
-            while (serialPort1.BytesToRead > 0)
+            List<byte> rx1 = new List<byte>();
+            DataRow dataRowRX1 = CSVdataTable.NewRow();
+            if (checkBox_insTime.Checked)
             {
-                try
-                {
-                    rx1[i] = (byte)serialPort1.ReadByte();
-                }
-                catch (Exception ex)
-                {
-                    //MessageBox.Show("Error reading port " + serialPort1.PortName + ": " + ex.Message);
-                    dataRowRX1["Signal"] = "Error reading port " + serialPort1.PortName + ": " + ex.Message;
-                }
-                i++;
-                if (i >= RS232_monitor.Properties.Settings.Default.rxBuffer)
-                {
-                    //MessageBox.Show(serialPort1.PortName + " receive buffer is full.\r\nFlushing data...");
-                    dataRowRX1["Signal"] = "Receive buffer overflow";
-                    //serialPort1.DiscardInBuffer();
-                    break;
-                }
+                dataRowRX1["Date"] = DateTime.Today.ToShortDateString();
+                dataRowRX1["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowRX1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
             }
-            dataRowRX1["Data"] = ConvertByteArrToHex(rx1, i);
+            if (checkBox_insDir.Checked)
+            {
+                dataRowRX1["Port"] = portname1;
+                dataRowRX1["Dir"] = "RX";
+            }
+            dataRowRX1["Mark"] = checkBox_Mark.Checked;
+            try
+            {
+                while (serialPort1.BytesToRead > 0) rx1.Add((byte)serialPort1.ReadByte());
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show("Error reading port " + serialPort1.PortName + ": " + ex.Message);
+                dataRowRX1["Signal"] = "Error reading port " + serialPort1.PortName + ": " + ex.Message;
+            }
+            dataRowRX1["Data"] = Accessory.ConvertByteArrayToHex(rx1.ToArray());
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowRX1);
             string outStr1 = "";
             //if (checkBox_insTime.Checked == true) outStr1 += dataRowRX1["Date"] + " " + dataRowRX1["Time"] + "." + dataRowRX1["Milis"] + " ";
             //if (checkBox_insDir.Checked == true) outStr1 += portname1 + "<< ";
             if (checkBox_displayPort1hex.Checked == true) outStr1 += dataRowRX1["Data"];
-            else outStr1 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx1, 0, i);
+            else outStr1 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx1.ToArray(), 0, rx1.Count);
             collectBuffer(outStr1, Port1DataIn, dataRowRX1["Date"] + " " + dataRowRX1["Time"] + "." + dataRowRX1["Milis"]);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowRX1["Date"] + "," + dataRowRX1["Time"] + "," + dataRowRX1["Milis"] + "," + dataRowRX1["Port"] + "," + dataRowRX1["Dir"] + "," + dataRowRX1["Data"] + "," + dataRowRX1["Signal"] + "," + dataRowRX1["Mark"] + "\r\n");
         }
 
         private void serialPort2_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            byte[] rx2 = new byte[RS232_monitor.Properties.Settings.Default.rxBuffer];
-            DataRow dataRowRX2 = null;
-            dataRowRX2 = CSVdataTable.NewRow();
-            dataRowRX2["Date"] = DateTime.Today.ToShortDateString();
-            dataRowRX2["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowRX2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowRX2["Port"] = portname2;
-            dataRowRX2["Dir"] = "RX";
-            int i = 0;
-            while (serialPort2.BytesToRead > 0)
+            List<byte> rx2 = new List<byte>();
+            DataRow dataRowRX2 = CSVdataTable.NewRow();
+            if (checkBox_insTime.Checked)
             {
-                try
-                {
-                    rx2[i] = (byte)serialPort2.ReadByte();
-                }
-                catch (Exception ex)
-                {
-                    //MessageBox.Show("Error reading port " + serialPort2.PortName + ": " + ex.Message);
-                    dataRowRX2["Signal"] = "Error reading port " + serialPort2.PortName + ": " + ex.Message;
-                }
-                i++;
-                if (i >= RS232_monitor.Properties.Settings.Default.rxBuffer)
-                {
-                    //MessageBox.Show(serialPort2.PortName + " receive buffer is full.\r\nFlushing data...");
-                    dataRowRX2["Signal"] = "Receive buffer overflow";
-                    //serialPort2.DiscardInBuffer();
-                    break;
-                }
+                dataRowRX2["Date"] = DateTime.Today.ToShortDateString();
+                dataRowRX2["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowRX2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
             }
-            dataRowRX2["Data"] = ConvertByteArrToHex(rx2, i);
+            if (checkBox_insDir.Checked)
+            {
+                dataRowRX2["Port"] = portname2;
+                dataRowRX2["Dir"] = "RX";
+            }
             dataRowRX2["Mark"] = checkBox_Mark.Checked;
+            try
+            {
+                while (serialPort2.BytesToRead > 0) rx2.Add((byte)serialPort2.ReadByte());
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show("Error reading port " + serialPort2.PortName + ": " + ex.Message);
+                dataRowRX2["Signal"] = "Error reading port " + serialPort2.PortName + ": " + ex.Message;
+            }
+            dataRowRX2["Data"] = Accessory.ConvertByteArrayToHex(rx2.ToArray());
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowRX2);
             string outStr2 = "";
             //if (checkBox_insTime.Checked == true) outStr2 += dataRowRX2["Date"] + " " + dataRowRX2["Time"] + "." + dataRowRX2["Milis"] + " ";
-            //kif (checkBox_insDir.Checked == true) outStr2 += portname2 + "<< ";
+            //if (checkBox_insDir.Checked == true) outStr2 += portname2 + "<< ";
             if (checkBox_displayPort2hex.Checked == true) outStr2 += dataRowRX2["Data"];
-            else outStr2 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx2, 0, i);
+            else outStr2 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx2.ToArray(), 0, rx2.Count);
             collectBuffer(outStr2, Port2DataIn, dataRowRX2["Date"] + " " + dataRowRX2["Time"] + "." + dataRowRX2["Milis"]);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowRX2["Date"] + "," + dataRowRX2["Time"] + "," + dataRowRX2["Milis"] + "," + dataRowRX2["Port"] + "," + dataRowRX2["Dir"] + "," + dataRowRX2["Data"] + "," + dataRowRX2["Signal"] + "," + dataRowRX2["Mark"] + "\r\n");
         }
 
         private void serialPort3_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            byte[] rx3 = new byte[RS232_monitor.Properties.Settings.Default.rxBuffer];
-            DataRow dataRowRX3 = null;
-            dataRowRX3 = CSVdataTable.NewRow();
-            dataRowRX3["Date"] = DateTime.Today.ToShortDateString();
-            dataRowRX3["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowRX3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowRX3["Port"] = portname3;
-            dataRowRX3["Dir"] = "RX";
-            int i = 0;
-            while (serialPort3.BytesToRead > 0)
+            List<byte> rx3 = new List<byte>();
+            DataRow dataRowRX3 = CSVdataTable.NewRow();
+            if (checkBox_insTime.Checked)
             {
-                try
-                {
-                    rx3[i] = (byte)serialPort3.ReadByte();
-                }
-                catch (Exception ex)
-                {
-                    //MessageBox.Show("Error reading port " + serialPort2.PortName + ": " + ex.Message);
-                    dataRowRX3["Signal"] = "Error reading port " + serialPort3.PortName + ": " + ex.Message;
-                }
-                i++;
-                if (i >= RS232_monitor.Properties.Settings.Default.rxBuffer)
-                {
-                    //MessageBox.Show(serialPort2.PortName + " receive buffer is full.\r\nFlushing data...");
-                    dataRowRX3["Signal"] = "Receive buffer overflow";
-                    //serialPort3.DiscardInBuffer();
-                    break;
-                }
+                dataRowRX3["Date"] = DateTime.Today.ToShortDateString();
+                dataRowRX3["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowRX3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
             }
-            dataRowRX3["Data"] = ConvertByteArrToHex(rx3, i);
+            if (checkBox_insDir.Checked)
+            {
+                dataRowRX3["Port"] = portname3;
+                dataRowRX3["Dir"] = "RX";
+            }
             dataRowRX3["Mark"] = checkBox_Mark.Checked;
+            try
+            {
+                while (serialPort3.BytesToRead > 0) rx3.Add((byte)serialPort3.ReadByte());
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show("Error reading port " + serialPort2.PortName + ": " + ex.Message);
+                dataRowRX3["Signal"] = "Error reading port " + serialPort3.PortName + ": " + ex.Message;
+            }
+            dataRowRX3["Data"] = Accessory.ConvertByteArrayToHex(rx3.ToArray());
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowRX3);
             string outStr3 = "";
             //if (checkBox_insTime.Checked == true) outStr2 += dataRowRX2["Date"] + " " + dataRowRX2["Time"] + "." + dataRowRX2["Milis"] + " ";
             //kif (checkBox_insDir.Checked == true) outStr2 += portname2 + "<< ";
             if (checkBox_displayPort3hex.Checked == true) outStr3 += dataRowRX3["Data"];
-            else outStr3 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx3, 0, i);
+            else outStr3 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx3.ToArray(), 0, rx3.Count);
             collectBuffer(outStr3, Port3DataIn, dataRowRX3["Date"] + " " + dataRowRX3["Time"] + "." + dataRowRX3["Milis"]);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowRX3["Date"] + "," + dataRowRX3["Time"] + "," + dataRowRX3["Milis"] + "," + dataRowRX3["Port"] + "," + dataRowRX3["Dir"] + "," + dataRowRX3["Data"] + "," + dataRowRX3["Signal"] + "," + dataRowRX3["Mark"] + "\r\n");
         }
 
         private void serialPort4_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            byte[] rx4 = new byte[RS232_monitor.Properties.Settings.Default.rxBuffer];
-            DataRow dataRowRX4 = null;
-            dataRowRX4 = CSVdataTable.NewRow();
-            dataRowRX4["Date"] = DateTime.Today.ToShortDateString();
-            dataRowRX4["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowRX4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowRX4["Port"] = portname4;
-            dataRowRX4["Dir"] = "RX";
-            int i = 0;
-            while (serialPort4.BytesToRead > 0)
+            List<byte> rx4 = new List<byte>();
+            DataRow dataRowRX4 = CSVdataTable.NewRow();
+            if (checkBox_insTime.Checked)
             {
-                try
-                {
-                    rx4[i] = (byte)serialPort4.ReadByte();
-                }
-                catch (Exception ex)
-                {
-                    //MessageBox.Show("Error reading port " + serialPort2.PortName + ": " + ex.Message);
-                    dataRowRX4["Signal"] = "Error reading port " + serialPort4.PortName + ": " + ex.Message;
-                }
-                i++;
-                if (i >= RS232_monitor.Properties.Settings.Default.rxBuffer)
-                {
-                    //MessageBox.Show(serialPort2.PortName + " receive buffer is full.\r\nFlushing data...");
-                    dataRowRX4["Signal"] = "Receive buffer overflow";
-                    //serialPort4.DiscardInBuffer();
-                    break;
-                }
+                dataRowRX4["Date"] = DateTime.Today.ToShortDateString();
+                dataRowRX4["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowRX4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
             }
-            dataRowRX4["Data"] = ConvertByteArrToHex(rx4, i);
+            if (checkBox_insDir.Checked)
+            {
+                dataRowRX4["Port"] = portname4;
+                dataRowRX4["Dir"] = "RX";
+            }
             dataRowRX4["Mark"] = checkBox_Mark.Checked;
+            try
+            {
+                while (serialPort4.BytesToRead > 0) rx4.Add((byte)serialPort4.ReadByte());
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show("Error reading port " + serialPort2.PortName + ": " + ex.Message);
+                dataRowRX4["Signal"] = "Error reading port " + serialPort4.PortName + ": " + ex.Message;
+            }
+            dataRowRX4["Data"] = Accessory.ConvertByteArrayToHex(rx4.ToArray());
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowRX4);
             string outStr4 = "";
             //if (checkBox_insTime.Checked == true) outStr2 += dataRowRX2["Date"] + " " + dataRowRX2["Time"] + "." + dataRowRX2["Milis"] + " ";
             //kif (checkBox_insDir.Checked == true) outStr2 += portname2 + "<< ";
             if (checkBox_displayPort4hex.Checked == true) outStr4 += dataRowRX4["Data"];
-            else outStr4 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx4, 0, i);
+            else outStr4 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx4.ToArray(), 0, rx4.Count);
             collectBuffer(outStr4, Port4DataIn, dataRowRX4["Date"] + " " + dataRowRX4["Time"] + "." + dataRowRX4["Milis"]);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowRX4["Date"] + "," + dataRowRX4["Time"] + "," + dataRowRX4["Milis"] + "," + dataRowRX4["Port"] + "," + dataRowRX4["Dir"] + "," + dataRowRX4["Data"] + "," + dataRowRX4["Signal"] + "," + dataRowRX4["Mark"] + "\r\n");
         }
@@ -931,11 +983,17 @@ namespace Dual_RS232_terminal
             SetPinCTS1(serialPort1.CtsHolding);
             DataRow dataRowPIN1 = null;
             dataRowPIN1 = CSVdataTable.NewRow();
-            dataRowPIN1["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN1["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN1["Port"] = portname1;
-            dataRowPIN1["Dir"] = "SG";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN1["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN1["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN1["Port"] = portname1;
+                dataRowPIN1["Dir"] = "SG";
+            }
             dataRowPIN1["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort1.CDHolding == true && o_cd1 == false)
@@ -980,7 +1038,7 @@ namespace Dual_RS232_terminal
                 outStr += "<" + portname1 + "_RINGv>";
                 SetPinRING1(false);
             }
-            if (outStr!="")
+            if (outStr != "")
             {
                 if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port1SignalIn, dataRowPIN1["Date"] + " " + dataRowPIN1["Time"] + "." + dataRowPIN1["Milis"]);
                 dataRowPIN1["Signal"] = outStr;
@@ -996,11 +1054,17 @@ namespace Dual_RS232_terminal
             SetPinCTS2(serialPort2.CtsHolding);
             DataRow dataRowPIN2 = null;
             dataRowPIN2 = CSVdataTable.NewRow();
-            dataRowPIN2["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN2["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN2["Port"] = portname2;
-            dataRowPIN2["Dir"] = "SG";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN2["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN2["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN2["Port"] = portname2;
+                dataRowPIN2["Dir"] = "SG";
+            }
             dataRowPIN2["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
 
@@ -1062,11 +1126,17 @@ namespace Dual_RS232_terminal
             SetPinCTS3(serialPort3.CtsHolding);
             DataRow dataRowPIN3 = null;
             dataRowPIN3 = CSVdataTable.NewRow();
-            dataRowPIN3["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN3["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN3["Port"] = portname3;
-            dataRowPIN3["Dir"] = "SG";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN3["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN3["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN3["Port"] = portname3;
+                dataRowPIN3["Dir"] = "SG";
+            }
             dataRowPIN3["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort3.CDHolding == true && o_cd3 == false)
@@ -1127,11 +1197,17 @@ namespace Dual_RS232_terminal
             SetPinCTS4(serialPort4.CtsHolding);
             DataRow dataRowPIN4 = null;
             dataRowPIN4 = CSVdataTable.NewRow();
-            dataRowPIN4["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN4["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN4["Port"] = portname4;
-            dataRowPIN4["Dir"] = "SG";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN4["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN4["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN4["Port"] = portname4;
+                dataRowPIN4["Dir"] = "SG";
+            }
             dataRowPIN4["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort4.CDHolding == true && o_cd4 == false)
@@ -1190,11 +1266,17 @@ namespace Dual_RS232_terminal
             //MessageBox.Show("Port1 error: " + e.EventType);
             DataRow dataRowPIN1 = null;
             dataRowPIN1 = CSVdataTable.NewRow();
-            dataRowPIN1["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN1["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN1["Port"] = portname1;
-            dataRowPIN1["Dir"] = "ER";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN1["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN1["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN1["Port"] = portname1;
+                dataRowPIN1["Dir"] = "ER";
+            }
             dataRowPIN1["Mark"] = checkBox_Mark.Checked;
             string outStr = "<!" + portname1 + " error: " + e.EventType + "!>";
             if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port1SignalIn, dataRowPIN1["Date"] + " " + dataRowPIN1["Time"] + "." + dataRowPIN1["Milis"]);
@@ -1208,11 +1290,17 @@ namespace Dual_RS232_terminal
             //MessageBox.Show("Port2 error: " + e.EventType);
             DataRow dataRowPIN2 = null;
             dataRowPIN2 = CSVdataTable.NewRow();
-            dataRowPIN2["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN2["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN2["Port"] = portname2;
-            dataRowPIN2["Dir"] = "ER";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN2["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN2["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN2["Port"] = portname2;
+                dataRowPIN2["Dir"] = "ER";
+            }
             dataRowPIN2["Mark"] = checkBox_Mark.Checked;
             string outStr = "<!" + portname1 + " error: " + e.EventType + "!>";
             if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port2SignalIn, dataRowPIN2["Date"] + " " + dataRowPIN2["Time"] + "." + dataRowPIN2["Milis"]);
@@ -1226,11 +1314,17 @@ namespace Dual_RS232_terminal
             //MessageBox.Show("Port2 error: " + e.EventType);
             DataRow dataRowPIN3 = null;
             dataRowPIN3 = CSVdataTable.NewRow();
-            dataRowPIN3["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN3["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN3["Port"] = portname3;
-            dataRowPIN3["Dir"] = "ER";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN3["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN3["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN3["Port"] = portname3;
+                dataRowPIN3["Dir"] = "ER";
+            }
             dataRowPIN3["Mark"] = checkBox_Mark.Checked;
             string outStr = "<!" + portname1 + " error: " + e.EventType + "!>";
             if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port3SignalIn, dataRowPIN3["Date"] + " " + dataRowPIN3["Time"] + "." + dataRowPIN3["Milis"]);
@@ -1244,11 +1338,17 @@ namespace Dual_RS232_terminal
             //MessageBox.Show("Port2 error: " + e.EventType);
             DataRow dataRowPIN4 = null;
             dataRowPIN4 = CSVdataTable.NewRow();
-            dataRowPIN4["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN4["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN4["Port"] = portname4;
-            dataRowPIN4["Dir"] = "ER";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN4["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN4["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN4["Port"] = portname4;
+                dataRowPIN4["Dir"] = "ER";
+            }
             dataRowPIN4["Mark"] = checkBox_Mark.Checked;
             string outStr = "<!" + portname1 + " error: " + e.EventType + "!>";
             if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port4SignalIn, dataRowPIN4["Date"] + " " + dataRowPIN4["Time"] + "." + dataRowPIN4["Milis"]);
@@ -1262,11 +1362,17 @@ namespace Dual_RS232_terminal
             serialPort1.DtrEnable = checkBox_DTR1.Checked;
             DataRow dataRowPIN1 = null;
             dataRowPIN1 = CSVdataTable.NewRow();
-            dataRowPIN1["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN1["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN1["Port"] = portname1;
-            dataRowPIN1["Dir"] = "User";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN1["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN1["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN1["Port"] = portname1;
+                dataRowPIN1["Dir"] = "User";
+            }
             dataRowPIN1["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort1.DtrEnable == true && o_dtr1 == false)
@@ -1290,11 +1396,17 @@ namespace Dual_RS232_terminal
             serialPort2.DtrEnable = checkBox_DTR2.Checked;
             DataRow dataRowPIN2 = null;
             dataRowPIN2 = CSVdataTable.NewRow();
-            dataRowPIN2["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN2["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN2["Port"] = portname2;
-            dataRowPIN2["Dir"] = "User";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN2["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN2["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN2["Port"] = portname2;
+                dataRowPIN2["Dir"] = "User";
+            }
             dataRowPIN2["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort2.DtrEnable == true && o_dtr2 == false)
@@ -1318,11 +1430,17 @@ namespace Dual_RS232_terminal
             serialPort3.DtrEnable = checkBox_DTR3.Checked;
             DataRow dataRowPIN3 = null;
             dataRowPIN3 = CSVdataTable.NewRow();
-            dataRowPIN3["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN3["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN3["Port"] = portname3;
-            dataRowPIN3["Dir"] = "User";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN3["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN3["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN3["Port"] = portname3;
+                dataRowPIN3["Dir"] = "User";
+            }
             dataRowPIN3["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort3.DtrEnable == true && o_dtr3 == false)
@@ -1346,11 +1464,17 @@ namespace Dual_RS232_terminal
             serialPort4.DtrEnable = checkBox_DTR4.Checked;
             DataRow dataRowPIN4 = null;
             dataRowPIN4 = CSVdataTable.NewRow();
-            dataRowPIN4["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN4["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN4["Port"] = portname4;
-            dataRowPIN4["Dir"] = "User";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN4["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN4["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN4["Port"] = portname4;
+                dataRowPIN4["Dir"] = "User";
+            }
             dataRowPIN4["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort4.DtrEnable == true && o_dtr4 == false)
@@ -1374,11 +1498,17 @@ namespace Dual_RS232_terminal
             serialPort1.RtsEnable = checkBox_RTS1.Checked;
             DataRow dataRowPIN1 = null;
             dataRowPIN1 = CSVdataTable.NewRow();
-            dataRowPIN1["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN1["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN1["Port"] = portname1;
-            dataRowPIN1["Dir"] = "User";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN1["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN1["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN1["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN1["Port"] = portname1;
+                dataRowPIN1["Dir"] = "User";
+            }
             dataRowPIN1["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort1.RtsEnable == true && o_rts1 == false && serialPort1.Handshake != Handshake.RequestToSend && serialPort1.Handshake != Handshake.RequestToSendXOnXOff)
@@ -1402,11 +1532,17 @@ namespace Dual_RS232_terminal
             serialPort2.RtsEnable = checkBox_RTS2.Checked;
             DataRow dataRowPIN2 = null;
             dataRowPIN2 = CSVdataTable.NewRow();
-            dataRowPIN2["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN2["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN2["Port"] = portname2;
-            dataRowPIN2["Dir"] = "User";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN2["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN2["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN2["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN2["Port"] = portname2;
+                dataRowPIN2["Dir"] = "User";
+            }
             dataRowPIN2["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort2.RtsEnable == true && o_rts2 == false)
@@ -1430,11 +1566,17 @@ namespace Dual_RS232_terminal
             serialPort3.RtsEnable = checkBox_RTS3.Checked;
             DataRow dataRowPIN3 = null;
             dataRowPIN3 = CSVdataTable.NewRow();
-            dataRowPIN3["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN3["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN3["Port"] = portname3;
-            dataRowPIN3["Dir"] = "User";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN3["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN3["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN3["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN3["Port"] = portname3;
+                dataRowPIN3["Dir"] = "User";
+            }
             dataRowPIN3["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort3.RtsEnable == true && o_rts3 == false)
@@ -1458,11 +1600,17 @@ namespace Dual_RS232_terminal
             serialPort4.RtsEnable = checkBox_RTS4.Checked;
             DataRow dataRowPIN4 = null;
             dataRowPIN4 = CSVdataTable.NewRow();
-            dataRowPIN4["Date"] = DateTime.Today.ToShortDateString();
-            dataRowPIN4["Time"] = DateTime.Now.ToLongTimeString();
-            dataRowPIN4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
-            dataRowPIN4["Port"] = portname4;
-            dataRowPIN4["Dir"] = "User";
+            if (checkBox_insTime.Checked)
+            {
+                dataRowPIN4["Date"] = DateTime.Today.ToShortDateString();
+                dataRowPIN4["Time"] = DateTime.Now.ToLongTimeString();
+                dataRowPIN4["Milis"] = DateTime.Now.Millisecond.ToString("D3");
+            }
+            if (checkBox_insDir.Checked)
+            {
+                dataRowPIN4["Port"] = portname4;
+                dataRowPIN4["Dir"] = "User";
+            }
             dataRowPIN4["Mark"] = checkBox_Mark.Checked;
             string outStr = "";
             if (serialPort4.RtsEnable == true && o_rts4 == false)
@@ -1730,15 +1878,15 @@ namespace Dual_RS232_terminal
         private void checkBox_commandhex_CheckedChanged(object sender, EventArgs e)
         {
             string tmpstr = textBox_command.Text;
-            if (checkBox_commandhex.Checked == true) textBox_command.Text = ConvertStringToHex(tmpstr);
-            else textBox_command.Text = ConvertHexToString(tmpstr);
+            if (checkBox_commandhex.Checked == true) textBox_command.Text = Accessory.ConvertStringToHex(tmpstr);
+            else textBox_command.Text = Accessory.ConvertHexToString(tmpstr);
         }
 
         private void checkBox_paramhex_CheckedChanged(object sender, EventArgs e)
         {
             string tmpstr = textBox_params.Text;
-            if (checkBox_paramhex.Checked == true) textBox_params.Text = ConvertStringToHex(tmpstr);
-            else textBox_params.Text = ConvertHexToString(tmpstr);
+            if (checkBox_paramhex.Checked == true) textBox_params.Text = Accessory.ConvertStringToHex(tmpstr);
+            else textBox_params.Text = Accessory.ConvertHexToString(tmpstr);
         }
 
         private void checkBox_send_CheckedChanged(object sender, EventArgs e)
@@ -1749,19 +1897,19 @@ namespace Dual_RS232_terminal
 
         private void textBox_command_Leave(object sender, EventArgs e)
         {
-            if (checkBox_commandhex.Checked == true) textBox_command.Text = checkHexString(textBox_command.Text);
+            if (checkBox_commandhex.Checked == true) textBox_command.Text = Accessory.checkHexString(textBox_command.Text);
             SendStringCollect();
         }
 
         private void textBox_params_Leave(object sender, EventArgs e)
         {
-            if (checkBox_paramhex.Checked == true) textBox_params.Text = checkHexString(textBox_params.Text);
+            if (checkBox_paramhex.Checked == true) textBox_params.Text = Accessory.checkHexString(textBox_params.Text);
             SendStringCollect();
         }
 
         private void textBox_suff_Leave(object sender, EventArgs e)
         {
-            if (checkBox_suffhex.Checked == true) textBox_suff.Text = checkHexString(textBox_suff.Text);
+            if (checkBox_suffhex.Checked == true) textBox_suff.Text = Accessory.checkHexString(textBox_suff.Text);
             SendStringCollect();
         }
 
@@ -1778,8 +1926,8 @@ namespace Dual_RS232_terminal
         private void checkBox_suffhex_CheckedChanged(object sender, EventArgs e)
         {
             string tmpstr = textBox_suff.Text;
-            if (checkBox_suffhex.Checked == true) textBox_suff.Text = ConvertStringToHex(tmpstr);
-            else textBox_suff.Text = ConvertHexToString(tmpstr);
+            if (checkBox_suffhex.Checked == true) textBox_suff.Text = Accessory.ConvertStringToHex(tmpstr);
+            else textBox_suff.Text = Accessory.ConvertHexToString(tmpstr);
         }
 
         private void checkBox_portName_CheckedChanged(object sender, EventArgs e)
@@ -1833,7 +1981,7 @@ namespace Dual_RS232_terminal
             {
                 try
                 {
-                    File.AppendAllText(saveFileDialog.FileName, textBox_terminal1.Text);
+                    File.WriteAllText(saveFileDialog.FileName, textBox_terminal1.Text);
                 }
                 catch (Exception ex)
                 {
@@ -1859,7 +2007,7 @@ namespace Dual_RS232_terminal
                 }
                 try
                 {
-                    File.AppendAllText(saveFileDialog.FileName, output, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
+                    File.WriteAllText(saveFileDialog.FileName, output, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
                 }
                 catch (Exception ex)
                 {
@@ -1977,6 +2125,7 @@ namespace Dual_RS232_terminal
             if (logToTextToolStripMenuItem.Checked == true)
             {
                 logToTextToolStripMenuItem.Checked = false;
+                textBox_terminal1.Enabled = false;
                 ((Control)this.tabPage2).Enabled = false;
                 if (logToGridToolStripMenuItem.Checked == false)
                 {
@@ -1987,6 +2136,7 @@ namespace Dual_RS232_terminal
             else
             {
                 logToTextToolStripMenuItem.Checked = true;
+                textBox_terminal1.Enabled = true;
                 ((Control)this.tabPage2).Enabled = true;
                 tabControl1.Enabled = true;
                 tabControl1.Visible = true;
@@ -2006,6 +2156,7 @@ namespace Dual_RS232_terminal
             if (logToGridToolStripMenuItem.Checked == true)
             {
                 logToGridToolStripMenuItem.Checked = false;
+                dataGridView.Enabled = false;
                 ((Control)this.tabPage1).Enabled = false;
                 if (logToTextToolStripMenuItem.Checked == false)
                 {
@@ -2016,6 +2167,7 @@ namespace Dual_RS232_terminal
             else
             {
                 logToGridToolStripMenuItem.Checked = true;
+                dataGridView.Enabled = true;
                 ((Control)this.tabPage1).Enabled = true;
                 tabControl1.Enabled = true;
                 tabControl1.Visible = true;
@@ -2048,30 +2200,18 @@ namespace Dual_RS232_terminal
             if (toolStripMenuItem_onlyData.Checked == false)
             {
                 this.serialPort1.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort1_ErrorReceived);
-                this.serialPort1.PinChanged += new System.IO.Ports.SerialPinChangedEventHandler(this.serialPort1_PinChanged);
-
                 this.serialPort2.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort2_ErrorReceived);
-                this.serialPort2.PinChanged += new System.IO.Ports.SerialPinChangedEventHandler(this.serialPort2_PinChanged);
-
                 this.serialPort3.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort3_ErrorReceived);
-                this.serialPort3.PinChanged += new System.IO.Ports.SerialPinChangedEventHandler(this.serialPort3_PinChanged);
-
                 this.serialPort4.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort4_ErrorReceived);
-                this.serialPort4.PinChanged += new System.IO.Ports.SerialPinChangedEventHandler(this.serialPort4_PinChanged);
+                checkBox_insPin.Checked = true;
             }
             else
             {
                 this.serialPort1.ErrorReceived -= this.serialPort1_ErrorReceived;
-                this.serialPort1.PinChanged -= this.serialPort1_PinChanged;
-
                 this.serialPort2.ErrorReceived -= this.serialPort2_ErrorReceived;
-                this.serialPort2.PinChanged -= this.serialPort2_PinChanged;
-
                 this.serialPort3.ErrorReceived -= this.serialPort3_ErrorReceived;
-                this.serialPort3.PinChanged -= this.serialPort3_PinChanged;
-
                 this.serialPort4.ErrorReceived -= this.serialPort4_ErrorReceived;
-                this.serialPort4.PinChanged -= this.serialPort4_PinChanged;
+                checkBox_insPin.Checked = false;
             }
         }
 
@@ -2233,111 +2373,43 @@ namespace Dual_RS232_terminal
             }
         }
 
-        public static string ConvertStringToHex(string utfString)
-        {
-            byte[] encodedBytes = System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetBytes(utfString);
-            string hexStr = "";
-            foreach (System.Char c in encodedBytes)
-            {
-                hexStr += ((int)c).ToString("X2") + " ";
-            }
-            return hexStr;
-        }
-
-        public static string ConvertByteArrToHex(byte[] byteArr, int arrLength)
-        {
-            string hexStr = "";
-            int i = 0;
-            for (i = 0; i < arrLength; i++)
-            {
-                hexStr += byteArr[i].ToString("X2") + " ";
-            }
-            return hexStr;
-        }
-
-        public static string ConvertHexToString(string hexString)
-        {
-            hexString = hexString.Replace(" ", "");
-            if (hexString.Length % 2 == 1) hexString = hexString + "0";
-            byte[] StrValue = new byte[hexString.Length / 2];
-            int i = 0;
-            while (hexString.Length > 1)
-            {
-                StrValue[i] = System.Convert.ToByte(System.Convert.ToUInt32(hexString.Substring(0, 2), 16));
-                hexString = hexString.Substring(2, hexString.Length - 2);
-                i++;
-            }
-            return System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(StrValue, 0, i);
-        }
-
-        public static byte[] ConvertHexToByte(string hexString)
-        {
-            hexString = hexString.Replace(" ", "");
-            if (hexString.Length % 2 == 1) hexString = hexString + "0";
-            byte[] byteValue = new byte[hexString.Length / 2];
-            int i = 0;
-            while (hexString.Length > 1)
-            {
-                byteValue[i] = System.Convert.ToByte(System.Convert.ToUInt32(hexString.Substring(0, 2), 16));
-                hexString = hexString.Substring(2, hexString.Length - 2);
-                i++;
-            }
-            return byteValue;
-        }
-
-        string checkHexString(string inStr)
-        {
-            string outStr = "";
-            if (inStr != "")
-            {
-                char[] str = inStr.ToCharArray(0, inStr.Length);
-                string tmpStr = "";
-                for (int i = 0; i < inStr.Length; i++)
-                {
-                    if ((str[i] >= 'A' && str[i] <= 'F') || (str[i] >= 'a' && str[i] <= 'f') || (str[i] >= '0' && str[i] <= '9'))
-                    {
-                        tmpStr += str[i].ToString();
-                    }
-                    else if (str[i] == ' ' && tmpStr.Length > 0)
-                    {
-                        for (int i1 = 0; i1 < 2 - tmpStr.Length; i1++) outStr += "0";
-                        outStr += tmpStr + " ";
-                        tmpStr = "";
-                    }
-                    if (tmpStr.Length == 2)
-                    {
-                        outStr += tmpStr + " ";
-                        tmpStr = "";
-                    }
-                }
-                if (tmpStr != "")
-                {
-                    for (int i = 0; i < 2 - tmpStr.Length; i++) outStr += "0";
-                    outStr += tmpStr + " ";
-                }
-                return outStr.ToUpperInvariant();
-            }
-            else return ("");
-        }
-
         void SendStringCollect()
         {
             string tmpStr;
             if (checkBox_commandhex.Checked == true) tmpStr = textBox_command.Text.Trim();
-            else tmpStr = ConvertStringToHex(textBox_command.Text).Trim();
+            else tmpStr = Accessory.ConvertStringToHex(textBox_command.Text).Trim();
             if (checkBox_paramhex.Checked == true) tmpStr += " " + textBox_params.Text.Trim();
-            else tmpStr += " " + ConvertStringToHex(textBox_params.Text).Trim();
+            else tmpStr += " " + Accessory.ConvertStringToHex(textBox_params.Text).Trim();
             if (checkBox_cr.Checked == true) tmpStr += " 0D";
             if (checkBox_lf.Checked == true) tmpStr += " 0A";
             if (checkBox_suff.Checked == true)
             {
                 if (checkBox_suffhex.Checked == true) tmpStr += " " + textBox_suff.Text.Trim();
-                else tmpStr += " " + ConvertStringToHex(textBox_suff.Text).Trim();
+                else tmpStr += " " + Accessory.ConvertStringToHex(textBox_suff.Text).Trim();
             }
-            textBox_senddata.Text = checkHexString(tmpStr);
+            textBox_senddata.Text = Accessory.checkHexString(tmpStr);
         }
 
         private object threadLock = new object();
+
+        private void checkBox_insPin_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_insPin.Checked == true)
+            {
+                this.serialPort1.PinChanged += this.serialPort1_PinChanged;
+                this.serialPort2.PinChanged += this.serialPort2_PinChanged;
+                this.serialPort3.PinChanged += this.serialPort3_PinChanged;
+                this.serialPort4.PinChanged += this.serialPort4_PinChanged;
+            }
+            else
+            {
+                this.serialPort1.PinChanged -= this.serialPort1_PinChanged;
+                this.serialPort2.PinChanged -= this.serialPort2_PinChanged;
+                this.serialPort3.PinChanged -= this.serialPort3_PinChanged;
+                this.serialPort4.PinChanged -= this.serialPort4_PinChanged;
+            }
+        }
+
         public void collectBuffer(string tmpBuffer, int state, string time)
         {
             if (tmpBuffer != "")
@@ -2677,5 +2749,30 @@ namespace Dual_RS232_terminal
             }
         }
 
+        /*
+ *      byte[] buffer = new byte[MAX_RECEIVE_BUFFER * 3];
+        Action kickoffRead = null;
+        kickoffRead = delegate
+        {
+            _serialPort.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
+            {
+                try
+                {
+                    int bytesRead = _serialPort.BaseStream.EndRead(ar);
+                    byte[] received = new byte[bytesRead];
+                    Buffer.BlockCopy(buffer, 0, received, 0, bytesRead);
+                    lock (_receiveBuffer)
+                    {
+                        _receiveBuffer.AddRange(received);
+                    }
+                    received = null; // Resetting this has no effect, but left in to rule it out.
+                }
+                catch (IOException) { }
+                kickoffRead();
+            },
+            null);
+        };
+        kickoffRead();
+*/
     }
 }
