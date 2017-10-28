@@ -25,6 +25,9 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
         string portname1, portname2, portname3, portname4;
         int txtOutState = 0;
         long oldTicks = DateTime.Now.Ticks, limitTick = 0;
+        int CSVLineNumberLimit = 0;
+        string CSVFileName = "";
+        int CSVLineCount = 0;
 
         public const byte Port1DataIn = 11;
         public const byte Port1DataOut = 12;
@@ -155,9 +158,9 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             autosaveTXTToolStripMenuItem1.Checked = RS232_monitor.Properties.Settings.Default.AutoLogTXT;
             terminaltxtToolStripMenuItem1.Text = RS232_monitor.Properties.Settings.Default.TXTlogFile;
             autosaveCSVToolStripMenuItem1.Checked = RS232_monitor.Properties.Settings.Default.AutoLogCSV;
-            terminalcsvToolStripMenuItem1.Text = RS232_monitor.Properties.Settings.Default.CSVlogFile;
             LineBreakToolStripTextBox1.Text = RS232_monitor.Properties.Settings.Default.LineBreakTimeout.ToString();
             limitTick = RS232_monitor.Properties.Settings.Default.LineBreakTimeout * 10000;
+            toolStripTextBox_CSVLinesNumber.Text = RS232_monitor.Properties.Settings.Default.CSVLineNumber;
 
             if (autosaveTXTToolStripMenuItem1.Checked == true) terminaltxtToolStripMenuItem1.Enabled = true;
             else terminaltxtToolStripMenuItem1.Enabled = false;
@@ -180,7 +183,8 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             checkBox_RTS2.Checked = false;
             checkBox_RTS3.Checked = false;
             checkBox_RTS4.Checked = false;
-
+            CSVFileName = DateTime.Today.ToShortDateString() + DateTime.Now.ToLongTimeString() + DateTime.Now.Millisecond.ToString("D3") + ".csv";
+            CSVLineCount = 0;
             if (comboBox_portname1.SelectedIndex != 0)
             {
                 comboBox_portname1.Enabled = false;
@@ -2074,8 +2078,8 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             RS232_monitor.Properties.Settings.Default.AutoLogTXT = autosaveTXTToolStripMenuItem1.Checked;
             RS232_monitor.Properties.Settings.Default.TXTlogFile = terminaltxtToolStripMenuItem1.Text;
             RS232_monitor.Properties.Settings.Default.AutoLogCSV = autosaveCSVToolStripMenuItem1.Checked;
-            RS232_monitor.Properties.Settings.Default.CSVlogFile = terminalcsvToolStripMenuItem1.Text;
             RS232_monitor.Properties.Settings.Default.LineBreakTimeout = limitTick / 10000;
+            RS232_monitor.Properties.Settings.Default.CSVLineNumber = toolStripTextBox_CSVLinesNumber.Text;
             RS232_monitor.Properties.Settings.Default.Save();
         }
 
@@ -2090,20 +2094,6 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             {
                 autosaveTXTToolStripMenuItem1.Checked = true;
                 terminaltxtToolStripMenuItem1.Enabled = false;
-            }
-        }
-
-        private void autosaveCSVToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            if (autosaveCSVToolStripMenuItem1.Checked == true)
-            {
-                autosaveCSVToolStripMenuItem1.Checked = false;
-                terminalcsvToolStripMenuItem1.Enabled = true;
-            }
-            else
-            {
-                autosaveCSVToolStripMenuItem1.Checked = true;
-                terminalcsvToolStripMenuItem1.Enabled = false;
             }
         }
 
@@ -2185,12 +2175,6 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (button_send.Enabled == true)
                 if (e.KeyData == Keys.Return)
                     button_send_Click(textBox_command, EventArgs.Empty);
-        }
-
-        private void toolStripTextBox1_TextChanged(object sender, EventArgs e)
-        {
-            long.TryParse(LineBreakToolStripTextBox1.Text, out limitTick);
-            limitTick = limitTick * 10000;
         }
 
         private void toolStripMenuItem_onlyData_Click(object sender, EventArgs e)
@@ -2410,6 +2394,22 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             }
         }
 
+        private void toolStripTextBox_CSVLinesNumber_Leave(object sender, EventArgs e)
+        {
+            Int32.TryParse(toolStripTextBox_CSVLinesNumber.Text, out CSVLineNumberLimit);
+            if (CSVLineNumberLimit < 10)
+            {
+                CSVLineNumberLimit = 10;
+                toolStripTextBox_CSVLinesNumber.Text = "10";
+            }
+        }
+
+        private void LineBreakToolStripTextBox1_Leave(object sender, EventArgs e)
+        {
+            long.TryParse(LineBreakToolStripTextBox1.Text, out limitTick);
+            limitTick = limitTick * 10000;
+        }
+
         public void collectBuffer(string tmpBuffer, int state, string time)
         {
             if (tmpBuffer != "")
@@ -2522,32 +2522,31 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
                 }
             }
         }
+
         public void CSVcollectBuffer(string tmpBuffer)
         {
             if (tmpBuffer != "")
             {
                 lock (threadLock)
                 {
-
-                    try
-                    {
-                        File.AppendAllText(terminalcsvToolStripMenuItem1.Text, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
-                    }
-                    catch (Exception ex)
-                    {
-                        //MessageBox.Show("\r\nError opening file " + terminalcsvToolStripMenuItem1.Text + ": " + ex.Message);
-                    }
+                    if (CSVLineCount >= CSVLineNumberLimit) CSVFileName = DateTime.Today.ToShortDateString() + DateTime.Now.ToLongTimeString() + DateTime.Now.Millisecond.ToString("D3") + ".csv";
+                        try
+                        {
+                            File.AppendAllText(CSVFileName, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
+                            CSVLineCount++;
+                        }
+                        catch (Exception ex)
+                        {
+                            //MessageBox.Show("\r\nError opening file " + CSVFileName + ": " + ex.Message);
+                        }
                 }
             }
         }
+
         public void CSVcollectGrid(DataRow tmpDataRow)
         {
             lock (threadLock)
             {
-                /*DataRow dataRowIN = null;
-                dataRowIN = CSVdataTable.NewRow();
-                dataRowIN = tmpDataRow;
-                CSVdataTable.Rows.Add(dataRowIN);*/
                 CSVdataTable.Rows.Add(tmpDataRow);
             }
         }
