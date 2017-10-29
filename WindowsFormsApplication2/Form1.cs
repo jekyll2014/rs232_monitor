@@ -2410,6 +2410,11 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             limitTick = limitTick * 10000;
         }
 
+        private void autosaveCSVToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            autosaveCSVToolStripMenuItem1.Checked = !autosaveCSVToolStripMenuItem1.Checked;
+        }
+
         public void collectBuffer(string tmpBuffer, int state, string time)
         {
             if (tmpBuffer != "")
@@ -2530,15 +2535,15 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
                 lock (threadLock)
                 {
                     if (CSVLineCount >= CSVLineNumberLimit) CSVFileName = DateTime.Today.ToShortDateString() + DateTime.Now.ToLongTimeString() + DateTime.Now.Millisecond.ToString("D3") + ".csv";
-                        try
-                        {
-                            File.AppendAllText(CSVFileName, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
-                            CSVLineCount++;
-                        }
-                        catch (Exception ex)
-                        {
-                            //MessageBox.Show("\r\nError opening file " + CSVFileName + ": " + ex.Message);
-                        }
+                    try
+                    {
+                        File.AppendAllText(CSVFileName, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
+                        CSVLineCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show("\r\nError opening file " + CSVFileName + ": " + ex.Message);
+                    }
                 }
             }
         }

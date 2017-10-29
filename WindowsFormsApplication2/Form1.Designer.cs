@@ -1195,6 +1195,7 @@ namespace RS232_monitor
             this.autosaveCSVToolStripMenuItem1.Name = "autosaveCSVToolStripMenuItem1";
             this.autosaveCSVToolStripMenuItem1.Size = new System.Drawing.Size(216, 22);
             this.autosaveCSVToolStripMenuItem1.Text = "Autosave .CSV";
+            this.autosaveCSVToolStripMenuItem1.Click += new System.EventHandler(this.autosaveCSVToolStripMenuItem1_Click);
             // 
             // LineBreakToolStripMenuItem1
             // 
