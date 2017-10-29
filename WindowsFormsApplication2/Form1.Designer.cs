@@ -1223,6 +1223,7 @@ namespace RS232_monitor
             // 
             // toolStripTextBox_CSVLinesNumber
             // 
+            this.toolStripTextBox_CSVLinesNumber.MaxLength = 5;
             this.toolStripTextBox_CSVLinesNumber.Name = "toolStripTextBox_CSVLinesNumber";
             this.toolStripTextBox_CSVLinesNumber.Size = new System.Drawing.Size(100, 23);
             this.toolStripTextBox_CSVLinesNumber.Text = "1024";
