@@ -430,5 +430,29 @@ namespace RS232_monitor.Properties {
                 this["LogText"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1024")]
+        public string CSVLineNumber {
+            get {
+                return ((string)(this["CSVLineNumber"]));
+            }
+            set {
+                this["CSVLineNumber"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1024")]
+        public string CSVStringLength {
+            get {
+                return ((string)(this["CSVStringLength"]));
+            }
+            set {
+                this["CSVStringLength"] = value;
+            }
+        }
     }
 }
