@@ -1686,15 +1686,6 @@ namespace RS232_monitor
             CSVdataTable.Rows.Clear();
         }
 
-        /*private void textBox_terminal1_TextChanged(object sender, EventArgs e)
-        {
-            if (autoscrollToolStripMenuItem.Checked == true)
-            {
-                textBox_terminal1.SelectionStart = textBox_terminal1.Text.Length;
-                textBox_terminal1.ScrollToCaret();
-            }
-        }*/
-
         private void comboBox_portname1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox_portname1.SelectedIndex != 0 && comboBox_portname1.SelectedIndex == comboBox_portname2.SelectedIndex) comboBox_portname1.SelectedIndex = 0;
@@ -2557,7 +2548,6 @@ namespace RS232_monitor
                         CSVLineCount++;
                     }
                     catch (Exception ex)
-                    //catch
                     {
                         MessageBox.Show("\r\nError opening file " + CSVFileName + ": " + ex.Message);
                     }
@@ -2769,31 +2759,5 @@ namespace RS232_monitor
                 this.checkBox_RI4.Checked = setPin;
             }
         }
-
-        /*
- *      byte[] buffer = new byte[MAX_RECEIVE_BUFFER * 3];
-        Action kickoffRead = null;
-        kickoffRead = delegate
-        {
-            _serialPort.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
-            {
-                try
-                {
-                    int bytesRead = _serialPort.BaseStream.EndRead(ar);
-                    byte[] received = new byte[bytesRead];
-                    Buffer.BlockCopy(buffer, 0, received, 0, bytesRead);
-                    lock (_receiveBuffer)
-                    {
-                        _receiveBuffer.AddRange(received);
-                    }
-                    received = null; // Resetting this has no effect, but left in to rule it out.
-                }
-                catch (IOException) { }
-                kickoffRead();
-            },
-            null);
-        };
-        kickoffRead();
-*/
     }
 }
