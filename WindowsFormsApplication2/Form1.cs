@@ -20,7 +20,7 @@ namespace RS232_monitor
         bool o_cd2, o_dsr2, o_dtr2, o_rts2, o_cts2;
         bool o_cd3, o_dsr3, o_dtr3, o_rts3, o_cts3;
         bool o_cd4, o_dsr4, o_dtr4, o_rts4, o_cts4;
-        public DataTable CSVdataTable = new System.Data.DataTable("Logs");
+        public DataTable CSVdataTable = new DataTable("Logs");
         string portname1, portname2, portname3, portname4;
         int txtOutState = 0;
         long oldTicks = DateTime.Now.Ticks, limitTick = 0;
@@ -2078,29 +2078,19 @@ namespace RS232_monitor
 
         private void autosaveTXTToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            if (autosaveTXTToolStripMenuItem1.Checked == true)
-            {
-                autosaveTXTToolStripMenuItem1.Checked = false;
-                terminaltxtToolStripMenuItem1.Enabled = true;
-            }
-            else
-            {
-                autosaveTXTToolStripMenuItem1.Checked = true;
-                terminaltxtToolStripMenuItem1.Enabled = false;
-            }
+                autosaveTXTToolStripMenuItem1.Checked = !autosaveTXTToolStripMenuItem1.Checked;
+                terminaltxtToolStripMenuItem1.Enabled = autosaveTXTToolStripMenuItem1.Checked;
         }
 
         private void lineWrapToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (lineWrapToolStripMenuItem.Checked == true) lineWrapToolStripMenuItem.Checked = false;
-            else lineWrapToolStripMenuItem.Checked = true;
+            lineWrapToolStripMenuItem.Checked = !lineWrapToolStripMenuItem.Checked;
             textBox_terminal.WordWrap = lineWrapToolStripMenuItem.Checked;
         }
 
         private void autoscrollToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (autoscrollToolStripMenuItem.Checked == true) autoscrollToolStripMenuItem.Checked = false;
-            else autoscrollToolStripMenuItem.Checked = true;
+            autoscrollToolStripMenuItem.Checked = !autoscrollToolStripMenuItem.Checked;
         }
 
         private void logToTextToolStripMenuItem_Click(object sender, EventArgs e)
