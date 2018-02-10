@@ -2079,7 +2079,7 @@ namespace RS232_monitor
         private void autosaveTXTToolStripMenuItem1_Click(object sender, EventArgs e)
         {
                 autosaveTXTToolStripMenuItem1.Checked = !autosaveTXTToolStripMenuItem1.Checked;
-                terminaltxtToolStripMenuItem1.Enabled = autosaveTXTToolStripMenuItem1.Checked;
+                terminaltxtToolStripMenuItem1.Enabled = !autosaveTXTToolStripMenuItem1.Checked;
         }
 
         private void lineWrapToolStripMenuItem_Click(object sender, EventArgs e)
