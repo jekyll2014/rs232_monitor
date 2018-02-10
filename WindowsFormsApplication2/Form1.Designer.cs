@@ -1211,6 +1211,7 @@ namespace RS232_monitor
             this.LineBreakToolStripTextBox1.Size = new System.Drawing.Size(100, 23);
             this.LineBreakToolStripTextBox1.Text = "1000";
             this.LineBreakToolStripTextBox1.Leave += new System.EventHandler(this.LineBreakToolStripTextBox1_Leave);
+            this.LineBreakToolStripTextBox1.TextChanged += new System.EventHandler(this.LineBreakToolStripTextBox1_Leave);
             // 
             // limitCSVLinesNumberToolStripMenuItem
             // 
