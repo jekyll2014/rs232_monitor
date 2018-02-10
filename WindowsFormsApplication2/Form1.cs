@@ -55,7 +55,7 @@ namespace RS232_monitor
         public FormMain()
         {
             InitializeComponent();
-            this.SetStyle(  ControlStyles.AllPaintingInWmPaint |  ControlStyles.UserPaint |  ControlStyles.DoubleBuffer, true);
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -160,7 +160,8 @@ namespace RS232_monitor
             autosaveCSVToolStripMenuItem1.Checked = RS232_monitor.Properties.Settings.Default.AutoLogCSV;
             LineBreakToolStripTextBox1.Text = RS232_monitor.Properties.Settings.Default.LineBreakTimeout.ToString();
             limitTick = RS232_monitor.Properties.Settings.Default.LineBreakTimeout * 10000;
-            toolStripTextBox_CSVLinesNumber.Text = RS232_monitor.Properties.Settings.Default.CSVLineNumber;
+            CSVLineNumberLimit = RS232_monitor.Properties.Settings.Default.CSVLineNumber;
+            toolStripTextBox_CSVLinesNumber.Text = CSVLineNumberLimit.ToString();
 
             if (autosaveTXTToolStripMenuItem1.Checked == true) terminaltxtToolStripMenuItem1.Enabled = true;
             else terminaltxtToolStripMenuItem1.Enabled = false;
@@ -183,7 +184,8 @@ namespace RS232_monitor
             checkBox_RTS2.Checked = false;
             checkBox_RTS3.Checked = false;
             checkBox_RTS4.Checked = false;
-            CSVFileName = DateTime.Today.ToShortDateString() + DateTime.Now.ToLongTimeString() + DateTime.Now.Millisecond.ToString("D3") + ".csv";
+            CSVFileName = DateTime.Today.ToShortDateString() + "_" + DateTime.Now.ToLongTimeString() + "_" + DateTime.Now.Millisecond.ToString("D3") + ".csv";
+            CSVFileName = CSVFileName.Replace(':', '-').Replace('\\', '-').Replace('/', '-');
             CSVLineCount = 0;
             if (comboBox_portname1.SelectedIndex != 0)
             {
@@ -2079,7 +2081,7 @@ namespace RS232_monitor
             RS232_monitor.Properties.Settings.Default.TXTlogFile = terminaltxtToolStripMenuItem1.Text;
             RS232_monitor.Properties.Settings.Default.AutoLogCSV = autosaveCSVToolStripMenuItem1.Checked;
             RS232_monitor.Properties.Settings.Default.LineBreakTimeout = limitTick / 10000;
-            RS232_monitor.Properties.Settings.Default.CSVLineNumber = toolStripTextBox_CSVLinesNumber.Text;
+            RS232_monitor.Properties.Settings.Default.CSVLineNumber = CSVLineNumberLimit;
             RS232_monitor.Properties.Settings.Default.Save();
         }
 
@@ -2406,11 +2408,11 @@ namespace RS232_monitor
         private void toolStripTextBox_CSVLinesNumber_Leave(object sender, EventArgs e)
         {
             Int32.TryParse(toolStripTextBox_CSVLinesNumber.Text, out CSVLineNumberLimit);
-            if (CSVLineNumberLimit < 10)
+            if (CSVLineNumberLimit < 1)
             {
-                CSVLineNumberLimit = 10;
-                toolStripTextBox_CSVLinesNumber.Text = "10";
+                CSVLineNumberLimit = 1;
             }
+            toolStripTextBox_CSVLinesNumber.Text = CSVLineNumberLimit.ToString();
         }
 
         private void LineBreakToolStripTextBox1_Leave(object sender, EventArgs e)
@@ -2543,16 +2545,21 @@ namespace RS232_monitor
             {
                 lock (threadLock)
                 {
-                    if (CSVLineCount >= CSVLineNumberLimit) CSVFileName = DateTime.Today.ToShortDateString() + "_" + DateTime.Now.ToLongTimeString() + "_" + DateTime.Now.Millisecond.ToString("D3") + ".csv";
+                    if (CSVLineCount >= CSVLineNumberLimit)
+                    {
+                        CSVFileName = DateTime.Today.ToShortDateString() + "_" + DateTime.Now.ToLongTimeString() + "_" + DateTime.Now.Millisecond.ToString("D3") + ".csv";
+                        CSVFileName = CSVFileName.Replace(':', '-').Replace('\\', '-').Replace('/', '-');
+                        CSVLineCount = 0;
+                    }
                     try
                     {
                         File.AppendAllText(CSVFileName, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
                         CSVLineCount++;
                     }
-                    //catch (Exception ex)
-                    catch
+                    catch (Exception ex)
+                    //catch
                     {
-                        //MessageBox.Show("\r\nError opening file " + CSVFileName + ": " + ex.Message);
+                        MessageBox.Show("\r\nError opening file " + CSVFileName + ": " + ex.Message);
                     }
                 }
             }
@@ -2572,7 +2579,7 @@ namespace RS232_monitor
             if (this.checkBox_CD1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD1);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2584,7 +2591,7 @@ namespace RS232_monitor
             if (this.checkBox_DSR1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR1);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2596,7 +2603,7 @@ namespace RS232_monitor
             if (this.checkBox_CTS1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS1);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2608,7 +2615,7 @@ namespace RS232_monitor
             if (this.checkBox_RI1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING1);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2621,7 +2628,7 @@ namespace RS232_monitor
             if (this.checkBox_CD2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD2);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2633,7 +2640,7 @@ namespace RS232_monitor
             if (this.checkBox_DSR2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR2);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2645,7 +2652,7 @@ namespace RS232_monitor
             if (this.checkBox_CTS2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS2);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2657,7 +2664,7 @@ namespace RS232_monitor
             if (this.checkBox_RI2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING2);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2670,7 +2677,7 @@ namespace RS232_monitor
             if (this.checkBox_CD3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD3);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2682,7 +2689,7 @@ namespace RS232_monitor
             if (this.checkBox_DSR3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR3);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2694,7 +2701,7 @@ namespace RS232_monitor
             if (this.checkBox_CTS3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS3);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2706,7 +2713,7 @@ namespace RS232_monitor
             if (this.checkBox_RI3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING3);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2719,7 +2726,7 @@ namespace RS232_monitor
             if (this.checkBox_CD4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD4);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2731,7 +2738,7 @@ namespace RS232_monitor
             if (this.checkBox_DSR4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR4);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2743,7 +2750,7 @@ namespace RS232_monitor
             if (this.checkBox_CTS4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS4);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2755,7 +2762,7 @@ namespace RS232_monitor
             if (this.checkBox_RI4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING4);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {

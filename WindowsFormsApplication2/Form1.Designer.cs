@@ -1227,6 +1227,7 @@ namespace RS232_monitor
             this.toolStripTextBox_CSVLinesNumber.Size = new System.Drawing.Size(100, 23);
             this.toolStripTextBox_CSVLinesNumber.Text = "1024";
             this.toolStripTextBox_CSVLinesNumber.Leave += new System.EventHandler(this.toolStripTextBox_CSVLinesNumber_Leave);
+            this.toolStripTextBox_CSVLinesNumber.TextChanged += new System.EventHandler(this.toolStripTextBox_CSVLinesNumber_Leave);
             // 
             // saveParametersToolStripMenuItem1
             // 
