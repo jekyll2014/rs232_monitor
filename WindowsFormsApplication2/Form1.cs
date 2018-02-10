@@ -13,15 +13,14 @@ namespace RS232_monitor
 {
     public partial class FormMain : Form
     {
-        /*
-Codepages list https://msdn.microsoft.com/en-us/library/system.text.encoding(v=vs.110).aspx
-const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
-*/
+        /*Codepages list https://msdn.microsoft.com/en-us/library/system.text.encoding(v=vs.110).aspx
+        const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;*/
+
         bool o_cd1, o_dsr1, o_dtr1, o_rts1, o_cts1;
         bool o_cd2, o_dsr2, o_dtr2, o_rts2, o_cts2;
         bool o_cd3, o_dsr3, o_dtr3, o_rts3, o_cts3;
         bool o_cd4, o_dsr4, o_dtr4, o_rts4, o_cts4;
-        public System.Data.DataTable CSVdataTable = new System.Data.DataTable("Logs");
+        public DataTable CSVdataTable = new System.Data.DataTable("Logs");
         string portname1, portname2, portname3, portname4;
         int txtOutState = 0;
         long oldTicks = DateTime.Now.Ticks, limitTick = 0;
@@ -56,6 +55,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
         public FormMain()
         {
             InitializeComponent();
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -160,7 +160,8 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             autosaveCSVToolStripMenuItem1.Checked = RS232_monitor.Properties.Settings.Default.AutoLogCSV;
             LineBreakToolStripTextBox1.Text = RS232_monitor.Properties.Settings.Default.LineBreakTimeout.ToString();
             limitTick = RS232_monitor.Properties.Settings.Default.LineBreakTimeout * 10000;
-            toolStripTextBox_CSVLinesNumber.Text = RS232_monitor.Properties.Settings.Default.CSVLineNumber;
+            CSVLineNumberLimit = RS232_monitor.Properties.Settings.Default.CSVLineNumber;
+            toolStripTextBox_CSVLinesNumber.Text = CSVLineNumberLimit.ToString();
 
             if (autosaveTXTToolStripMenuItem1.Checked == true) terminaltxtToolStripMenuItem1.Enabled = true;
             else terminaltxtToolStripMenuItem1.Enabled = false;
@@ -183,7 +184,8 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             checkBox_RTS2.Checked = false;
             checkBox_RTS3.Checked = false;
             checkBox_RTS4.Checked = false;
-            CSVFileName = DateTime.Today.ToShortDateString() + DateTime.Now.ToLongTimeString() + DateTime.Now.Millisecond.ToString("D3") + ".csv";
+            CSVFileName = DateTime.Today.ToShortDateString() + "_" + DateTime.Now.ToLongTimeString() + "_" + DateTime.Now.Millisecond.ToString("D3") + ".csv";
+            CSVFileName = CSVFileName.Replace(':', '-').Replace('\\', '-').Replace('/', '-');
             CSVLineCount = 0;
             if (comboBox_portname1.SelectedIndex != 0)
             {
@@ -1680,18 +1682,9 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
 
         private void button_clear1_Click(object sender, EventArgs e)
         {
-            textBox_terminal1.Clear();
+            textBox_terminal.Clear();
             CSVdataTable.Rows.Clear();
         }
-
-        /*private void textBox_terminal1_TextChanged(object sender, EventArgs e)
-        {
-            if (autoscrollToolStripMenuItem.Checked == true)
-            {
-                textBox_terminal1.SelectionStart = textBox_terminal1.Text.Length;
-                textBox_terminal1.ScrollToCaret();
-            }
-        }*/
 
         private void comboBox_portname1_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1985,7 +1978,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             {
                 try
                 {
-                    File.WriteAllText(saveFileDialog.FileName, textBox_terminal1.Text);
+                    File.WriteAllText(saveFileDialog.FileName, textBox_terminal.Text);
                 }
                 catch (Exception ex)
                 {
@@ -2079,7 +2072,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             RS232_monitor.Properties.Settings.Default.TXTlogFile = terminaltxtToolStripMenuItem1.Text;
             RS232_monitor.Properties.Settings.Default.AutoLogCSV = autosaveCSVToolStripMenuItem1.Checked;
             RS232_monitor.Properties.Settings.Default.LineBreakTimeout = limitTick / 10000;
-            RS232_monitor.Properties.Settings.Default.CSVLineNumber = toolStripTextBox_CSVLinesNumber.Text;
+            RS232_monitor.Properties.Settings.Default.CSVLineNumber = CSVLineNumberLimit;
             RS232_monitor.Properties.Settings.Default.Save();
         }
 
@@ -2101,7 +2094,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
         {
             if (lineWrapToolStripMenuItem.Checked == true) lineWrapToolStripMenuItem.Checked = false;
             else lineWrapToolStripMenuItem.Checked = true;
-            textBox_terminal1.WordWrap = lineWrapToolStripMenuItem.Checked;
+            textBox_terminal.WordWrap = lineWrapToolStripMenuItem.Checked;
         }
 
         private void autoscrollToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2115,7 +2108,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (logToTextToolStripMenuItem.Checked == true)
             {
                 logToTextToolStripMenuItem.Checked = false;
-                textBox_terminal1.Enabled = false;
+                textBox_terminal.Enabled = false;
                 ((Control)this.tabPage2).Enabled = false;
                 if (logToGridToolStripMenuItem.Checked == false)
                 {
@@ -2126,7 +2119,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             else
             {
                 logToTextToolStripMenuItem.Checked = true;
-                textBox_terminal1.Enabled = true;
+                textBox_terminal.Enabled = true;
                 ((Control)this.tabPage2).Enabled = true;
                 tabControl1.Enabled = true;
                 tabControl1.Visible = true;
@@ -2344,16 +2337,25 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             // calling thread to the thread ID of the creating thread.
             // If these threads are different, it returns true.
             //if (this.textBox_terminal1.InvokeRequired)
-            if (this.textBox_terminal1.InvokeRequired)
+            if (textBox_terminal.InvokeRequired)
             {
                 SetTextCallback1 d = new SetTextCallback1(SetText);
-                this.BeginInvoke(d, new object[] { text });
+                Invoke(d, new object[] { text });
             }
             else
             {
-                //this.textBox_terminal1.Text += text;
-                this.textBox_terminal1.SelectionStart = this.textBox_terminal1.TextLength;
-                this.textBox_terminal1.SelectedText = text;
+                int pos = textBox_terminal.SelectionStart;
+                textBox_terminal.AppendText(text);
+                if (autoscrollToolStripMenuItem.Checked)
+                {
+                    textBox_terminal.SelectionStart = textBox_terminal.Text.Length;
+                    textBox_terminal.ScrollToCaret();
+                }
+                else
+                {
+                    textBox_terminal.SelectionStart = pos;
+                    textBox_terminal.ScrollToCaret();
+                }
             }
         }
 
@@ -2397,11 +2399,11 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
         private void toolStripTextBox_CSVLinesNumber_Leave(object sender, EventArgs e)
         {
             Int32.TryParse(toolStripTextBox_CSVLinesNumber.Text, out CSVLineNumberLimit);
-            if (CSVLineNumberLimit < 10)
+            if (CSVLineNumberLimit < 1)
             {
-                CSVLineNumberLimit = 10;
-                toolStripTextBox_CSVLinesNumber.Text = "10";
+                CSVLineNumberLimit = 1;
             }
+            toolStripTextBox_CSVLinesNumber.Text = CSVLineNumberLimit.ToString();
         }
 
         private void LineBreakToolStripTextBox1_Leave(object sender, EventArgs e)
@@ -2534,7 +2536,12 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             {
                 lock (threadLock)
                 {
-                    if (CSVLineCount >= CSVLineNumberLimit) CSVFileName = DateTime.Today.ToShortDateString() +"_"+ DateTime.Now.ToLongTimeString() +"_"+ DateTime.Now.Millisecond.ToString("D3") + ".csv";
+                    if (CSVLineCount >= CSVLineNumberLimit)
+                    {
+                        CSVFileName = DateTime.Today.ToShortDateString() + "_" + DateTime.Now.ToLongTimeString() + "_" + DateTime.Now.Millisecond.ToString("D3") + ".csv";
+                        CSVFileName = CSVFileName.Replace(':', '-').Replace('\\', '-').Replace('/', '-');
+                        CSVLineCount = 0;
+                    }
                     try
                     {
                         File.AppendAllText(CSVFileName, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
@@ -2542,7 +2549,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
                     }
                     catch (Exception ex)
                     {
-                        //MessageBox.Show("\r\nError opening file " + CSVFileName + ": " + ex.Message);
+                        MessageBox.Show("\r\nError opening file " + CSVFileName + ": " + ex.Message);
                     }
                 }
             }
@@ -2562,7 +2569,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_CD1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD1);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2574,7 +2581,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_DSR1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR1);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2586,7 +2593,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_CTS1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS1);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2598,7 +2605,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_RI1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING1);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2611,7 +2618,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_CD2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD2);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2623,7 +2630,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_DSR2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR2);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2635,7 +2642,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_CTS2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS2);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2647,7 +2654,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_RI2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING2);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2660,7 +2667,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_CD3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD3);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2672,7 +2679,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_DSR3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR3);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2684,7 +2691,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_CTS3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS3);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2696,7 +2703,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_RI3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING3);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2709,7 +2716,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_CD4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD4);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2721,7 +2728,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_DSR4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR4);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2733,7 +2740,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_CTS4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS4);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
@@ -2745,38 +2752,12 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (this.checkBox_RI4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING4);
-                this.BeginInvoke(d, new object[] { setPin });
+                Invoke(d, new object[] { setPin });
             }
             else
             {
                 this.checkBox_RI4.Checked = setPin;
             }
         }
-
-        /*
- *      byte[] buffer = new byte[MAX_RECEIVE_BUFFER * 3];
-        Action kickoffRead = null;
-        kickoffRead = delegate
-        {
-            _serialPort.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
-            {
-                try
-                {
-                    int bytesRead = _serialPort.BaseStream.EndRead(ar);
-                    byte[] received = new byte[bytesRead];
-                    Buffer.BlockCopy(buffer, 0, received, 0, bytesRead);
-                    lock (_receiveBuffer)
-                    {
-                        _receiveBuffer.AddRange(received);
-                    }
-                    received = null; // Resetting this has no effect, but left in to rule it out.
-                }
-                catch (IOException) { }
-                kickoffRead();
-            },
-            null);
-        };
-        kickoffRead();
-*/
     }
 }
