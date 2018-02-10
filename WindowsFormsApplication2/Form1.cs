@@ -13,10 +13,9 @@ namespace RS232_monitor
 {
     public partial class FormMain : Form
     {
-        /*
-Codepages list https://msdn.microsoft.com/en-us/library/system.text.encoding(v=vs.110).aspx
-const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
-*/
+        /*Codepages list https://msdn.microsoft.com/en-us/library/system.text.encoding(v=vs.110).aspx
+        const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;*/
+
         bool o_cd1, o_dsr1, o_dtr1, o_rts1, o_cts1;
         bool o_cd2, o_dsr2, o_dtr2, o_rts2, o_cts2;
         bool o_cd3, o_dsr3, o_dtr3, o_rts3, o_cts3;
@@ -56,6 +55,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
         public FormMain()
         {
             InitializeComponent();
+            this.SetStyle(  ControlStyles.AllPaintingInWmPaint |  ControlStyles.UserPaint |  ControlStyles.DoubleBuffer, true);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -1680,7 +1680,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
 
         private void button_clear1_Click(object sender, EventArgs e)
         {
-            textBox_terminal1.Clear();
+            textBox_terminal.Clear();
             CSVdataTable.Rows.Clear();
         }
 
@@ -1985,7 +1985,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             {
                 try
                 {
-                    File.WriteAllText(saveFileDialog.FileName, textBox_terminal1.Text);
+                    File.WriteAllText(saveFileDialog.FileName, textBox_terminal.Text);
                 }
                 catch (Exception ex)
                 {
@@ -2101,7 +2101,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
         {
             if (lineWrapToolStripMenuItem.Checked == true) lineWrapToolStripMenuItem.Checked = false;
             else lineWrapToolStripMenuItem.Checked = true;
-            textBox_terminal1.WordWrap = lineWrapToolStripMenuItem.Checked;
+            textBox_terminal.WordWrap = lineWrapToolStripMenuItem.Checked;
         }
 
         private void autoscrollToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2115,7 +2115,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             if (logToTextToolStripMenuItem.Checked == true)
             {
                 logToTextToolStripMenuItem.Checked = false;
-                textBox_terminal1.Enabled = false;
+                textBox_terminal.Enabled = false;
                 ((Control)this.tabPage2).Enabled = false;
                 if (logToGridToolStripMenuItem.Checked == false)
                 {
@@ -2126,7 +2126,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             else
             {
                 logToTextToolStripMenuItem.Checked = true;
-                textBox_terminal1.Enabled = true;
+                textBox_terminal.Enabled = true;
                 ((Control)this.tabPage2).Enabled = true;
                 tabControl1.Enabled = true;
                 tabControl1.Visible = true;
@@ -2344,16 +2344,25 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             // calling thread to the thread ID of the creating thread.
             // If these threads are different, it returns true.
             //if (this.textBox_terminal1.InvokeRequired)
-            if (this.textBox_terminal1.InvokeRequired)
+            if (textBox_terminal.InvokeRequired)
             {
                 SetTextCallback1 d = new SetTextCallback1(SetText);
-                this.BeginInvoke(d, new object[] { text });
+                Invoke(d, new object[] { text });
             }
             else
             {
-                //this.textBox_terminal1.Text += text;
-                this.textBox_terminal1.SelectionStart = this.textBox_terminal1.TextLength;
-                this.textBox_terminal1.SelectedText = text;
+                int pos = textBox_terminal.SelectionStart;
+                textBox_terminal.AppendText(text);
+                if (autoscrollToolStripMenuItem.Checked)
+                {
+                    textBox_terminal.SelectionStart = textBox_terminal.Text.Length;
+                    textBox_terminal.ScrollToCaret();
+                }
+                else
+                {
+                    textBox_terminal.SelectionStart = pos;
+                    textBox_terminal.ScrollToCaret();
+                }
             }
         }
 
@@ -2534,7 +2543,7 @@ const int inputCodePage = RS232_monitor.Properties.Settings.Default.CodePage;
             {
                 lock (threadLock)
                 {
-                    if (CSVLineCount >= CSVLineNumberLimit) CSVFileName = DateTime.Today.ToShortDateString() +"_"+ DateTime.Now.ToLongTimeString() +"_"+ DateTime.Now.Millisecond.ToString("D3") + ".csv";
+                    if (CSVLineCount >= CSVLineNumberLimit) CSVFileName = DateTime.Today.ToShortDateString() + "_" + DateTime.Now.ToLongTimeString() + "_" + DateTime.Now.Millisecond.ToString("D3") + ".csv";
                     try
                     {
                         File.AppendAllText(CSVFileName, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
