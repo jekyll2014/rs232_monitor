@@ -26,6 +26,8 @@ namespace RS232_monitor
         int CSVLineNumberLimit = 0;
         string CSVFileName = "";
         int CSVLineCount = 0;
+        int LogLinesLimit = 100;
+
 
         public const byte Port1DataIn = 11;
         public const byte Port1DataOut = 12;
@@ -161,6 +163,7 @@ namespace RS232_monitor
             limitTick = RS232_monitor.Properties.Settings.Default.LineBreakTimeout * 10000;
             CSVLineNumberLimit = RS232_monitor.Properties.Settings.Default.CSVLineNumber;
             toolStripTextBox_CSVLinesNumber.Text = CSVLineNumberLimit.ToString();
+            LogLinesLimit = Properties.Settings.Default.LogLinesLimit;
 
             if (autosaveTXTToolStripMenuItem1.Checked == true) terminaltxtToolStripMenuItem1.Enabled = true;
             else terminaltxtToolStripMenuItem1.Enabled = false;
@@ -2077,8 +2080,8 @@ namespace RS232_monitor
 
         private void autosaveTXTToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-                autosaveTXTToolStripMenuItem1.Checked = !autosaveTXTToolStripMenuItem1.Checked;
-                terminaltxtToolStripMenuItem1.Enabled = !autosaveTXTToolStripMenuItem1.Checked;
+            autosaveTXTToolStripMenuItem1.Checked = !autosaveTXTToolStripMenuItem1.Checked;
+            terminaltxtToolStripMenuItem1.Enabled = !autosaveTXTToolStripMenuItem1.Checked;
         }
 
         private void lineWrapToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2335,6 +2338,16 @@ namespace RS232_monitor
             {
                 int pos = textBox_terminal.SelectionStart;
                 textBox_terminal.AppendText(text);
+                if (textBox_terminal.Lines.Length > LogLinesLimit)
+                {
+                    StringBuilder tmp = new StringBuilder();
+                    for (int i = textBox_terminal.Lines.Length - LogLinesLimit; i < textBox_terminal.Lines.Length; i++)
+                    {
+                        tmp.Append(textBox_terminal.Lines[i]);
+                        tmp.Append("\r\n");
+                    }
+                    textBox_terminal.Text = tmp.ToString();
+                }
                 if (autoscrollToolStripMenuItem.Checked)
                 {
                     textBox_terminal.SelectionStart = textBox_terminal.Text.Length;
