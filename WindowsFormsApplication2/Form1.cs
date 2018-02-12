@@ -6,7 +6,6 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RS232_monitor
@@ -2330,7 +2329,7 @@ namespace RS232_monitor
             if (textBox_terminal.InvokeRequired)
             {
                 SetTextCallback1 d = new SetTextCallback1(SetText);
-                Invoke(d, new object[] { text });
+                BeginInvoke(d, new object[] { text });
             }
             else
             {
@@ -2559,7 +2558,7 @@ namespace RS232_monitor
             if (this.checkBox_CD1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD1);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2571,7 +2570,7 @@ namespace RS232_monitor
             if (this.checkBox_DSR1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR1);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2583,7 +2582,7 @@ namespace RS232_monitor
             if (this.checkBox_CTS1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS1);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2595,7 +2594,7 @@ namespace RS232_monitor
             if (this.checkBox_RI1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING1);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2608,7 +2607,7 @@ namespace RS232_monitor
             if (this.checkBox_CD2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD2);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2620,7 +2619,7 @@ namespace RS232_monitor
             if (this.checkBox_DSR2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR2);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2632,7 +2631,7 @@ namespace RS232_monitor
             if (this.checkBox_CTS2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS2);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2644,7 +2643,7 @@ namespace RS232_monitor
             if (this.checkBox_RI2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING2);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2657,7 +2656,7 @@ namespace RS232_monitor
             if (this.checkBox_CD3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD3);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2669,7 +2668,7 @@ namespace RS232_monitor
             if (this.checkBox_DSR3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR3);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2681,7 +2680,7 @@ namespace RS232_monitor
             if (this.checkBox_CTS3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS3);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2693,7 +2692,7 @@ namespace RS232_monitor
             if (this.checkBox_RI3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING3);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2706,7 +2705,7 @@ namespace RS232_monitor
             if (this.checkBox_CD4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD4);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2718,7 +2717,7 @@ namespace RS232_monitor
             if (this.checkBox_DSR4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR4);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2730,7 +2729,7 @@ namespace RS232_monitor
             if (this.checkBox_CTS4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS4);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
@@ -2742,7 +2741,7 @@ namespace RS232_monitor
             if (this.checkBox_RI4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING4);
-                Invoke(d, new object[] { setPin });
+                BeginInvoke(d, new object[] { setPin });
             }
             else
             {
