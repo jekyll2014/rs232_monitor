@@ -6,7 +6,6 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RS232_monitor
@@ -55,7 +54,7 @@ namespace RS232_monitor
         public FormMain()
         {
             InitializeComponent();
-            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -263,8 +262,8 @@ namespace RS232_monitor
 
                     return;
                 }
-                if (checkBox_insPin.Checked) this.serialPort1.PinChanged += this.serialPort1_PinChanged;
-                this.serialPort1.DataReceived += this.serialPort1_DataReceived;
+                if (checkBox_insPin.Checked) serialPort1.PinChanged += serialPort1_PinChanged;
+                serialPort1.DataReceived += serialPort1_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -364,8 +363,8 @@ namespace RS232_monitor
                     comboBox_stopbits4.Enabled = true;
                     return;
                 }
-                if (checkBox_insPin.Checked) this.serialPort2.PinChanged += this.serialPort2_PinChanged;
-                this.serialPort2.DataReceived += this.serialPort2_DataReceived;
+                if (checkBox_insPin.Checked) serialPort2.PinChanged += serialPort2_PinChanged;
+                serialPort2.DataReceived += serialPort2_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -464,8 +463,8 @@ namespace RS232_monitor
                     comboBox_stopbits4.Enabled = true;
                     return;
                 }
-                if (checkBox_insPin.Checked) this.serialPort3.PinChanged += this.serialPort3_PinChanged;
-                this.serialPort3.DataReceived += this.serialPort3_DataReceived;
+                if (checkBox_insPin.Checked) serialPort3.PinChanged += serialPort3_PinChanged;
+                serialPort3.DataReceived += serialPort3_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -564,8 +563,8 @@ namespace RS232_monitor
                     comboBox_stopbits4.Enabled = true;
                     return;
                 }
-                if (checkBox_insPin.Checked) this.serialPort4.PinChanged += this.serialPort4_PinChanged;
-                this.serialPort4.DataReceived += this.serialPort4_DataReceived;
+                if (checkBox_insPin.Checked) serialPort4.PinChanged += serialPort4_PinChanged;
+                serialPort4.DataReceived += serialPort4_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -2099,7 +2098,7 @@ namespace RS232_monitor
             {
                 logToTextToolStripMenuItem.Checked = false;
                 textBox_terminal.Enabled = false;
-                ((Control)this.tabPage2).Enabled = false;
+                ((Control)tabPage2).Enabled = false;
                 if (logToGridToolStripMenuItem.Checked == false)
                 {
                     tabControl1.Enabled = false;
@@ -2110,7 +2109,7 @@ namespace RS232_monitor
             {
                 logToTextToolStripMenuItem.Checked = true;
                 textBox_terminal.Enabled = true;
-                ((Control)this.tabPage2).Enabled = true;
+                ((Control)tabPage2).Enabled = true;
                 tabControl1.Enabled = true;
                 tabControl1.Visible = true;
             }
@@ -2130,7 +2129,7 @@ namespace RS232_monitor
             {
                 logToGridToolStripMenuItem.Checked = false;
                 dataGridView.Enabled = false;
-                ((Control)this.tabPage1).Enabled = false;
+                ((Control)tabPage1).Enabled = false;
                 if (logToTextToolStripMenuItem.Checked == false)
                 {
                     tabControl1.Enabled = false;
@@ -2141,7 +2140,7 @@ namespace RS232_monitor
             {
                 logToGridToolStripMenuItem.Checked = true;
                 dataGridView.Enabled = true;
-                ((Control)this.tabPage1).Enabled = true;
+                ((Control)tabPage1).Enabled = true;
                 tabControl1.Enabled = true;
                 tabControl1.Visible = true;
             }
@@ -2166,18 +2165,18 @@ namespace RS232_monitor
 
             if (toolStripMenuItem_onlyData.Checked == false)
             {
-                this.serialPort1.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort1_ErrorReceived);
-                this.serialPort2.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort2_ErrorReceived);
-                this.serialPort3.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort3_ErrorReceived);
-                this.serialPort4.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort4_ErrorReceived);
+                serialPort1.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(serialPort1_ErrorReceived);
+                serialPort2.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(serialPort2_ErrorReceived);
+                serialPort3.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(serialPort3_ErrorReceived);
+                serialPort4.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(serialPort4_ErrorReceived);
                 checkBox_insPin.Checked = true;
             }
             else
             {
-                this.serialPort1.ErrorReceived -= this.serialPort1_ErrorReceived;
-                this.serialPort2.ErrorReceived -= this.serialPort2_ErrorReceived;
-                this.serialPort3.ErrorReceived -= this.serialPort3_ErrorReceived;
-                this.serialPort4.ErrorReceived -= this.serialPort4_ErrorReceived;
+                serialPort1.ErrorReceived -= serialPort1_ErrorReceived;
+                serialPort2.ErrorReceived -= serialPort2_ErrorReceived;
+                serialPort3.ErrorReceived -= serialPort3_ErrorReceived;
+                serialPort4.ErrorReceived -= serialPort4_ErrorReceived;
                 checkBox_insPin.Checked = false;
             }
         }
@@ -2326,7 +2325,7 @@ namespace RS232_monitor
             // InvokeRequired required compares the thread ID of the
             // calling thread to the thread ID of the creating thread.
             // If these threads are different, it returns true.
-            //if (this.textBox_terminal1.InvokeRequired)
+            //if (textBox_terminal1.InvokeRequired)
             if (textBox_terminal.InvokeRequired)
             {
                 SetTextCallback1 d = new SetTextCallback1(SetText);
@@ -2372,17 +2371,17 @@ namespace RS232_monitor
         {
             if (checkBox_insPin.Checked == true)
             {
-                this.serialPort1.PinChanged += this.serialPort1_PinChanged;
-                this.serialPort2.PinChanged += this.serialPort2_PinChanged;
-                this.serialPort3.PinChanged += this.serialPort3_PinChanged;
-                this.serialPort4.PinChanged += this.serialPort4_PinChanged;
+                serialPort1.PinChanged += serialPort1_PinChanged;
+                serialPort2.PinChanged += serialPort2_PinChanged;
+                serialPort3.PinChanged += serialPort3_PinChanged;
+                serialPort4.PinChanged += serialPort4_PinChanged;
             }
             else
             {
-                this.serialPort1.PinChanged -= this.serialPort1_PinChanged;
-                this.serialPort2.PinChanged -= this.serialPort2_PinChanged;
-                this.serialPort3.PinChanged -= this.serialPort3_PinChanged;
-                this.serialPort4.PinChanged -= this.serialPort4_PinChanged;
+                serialPort1.PinChanged -= serialPort1_PinChanged;
+                serialPort2.PinChanged -= serialPort2_PinChanged;
+                serialPort3.PinChanged -= serialPort3_PinChanged;
+                serialPort4.PinChanged -= serialPort4_PinChanged;
             }
         }
 
@@ -2556,197 +2555,197 @@ namespace RS232_monitor
         delegate void SetPinCallback1(bool setPin);
         private void SetPinCD1(bool setPin)
         {
-            if (this.checkBox_CD1.InvokeRequired)
+            if (checkBox_CD1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD1);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_CD1.Checked = setPin;
+                checkBox_CD1.Checked = setPin;
             }
         }
         private void SetPinDSR1(bool setPin)
         {
-            if (this.checkBox_DSR1.InvokeRequired)
+            if (checkBox_DSR1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR1);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_DSR1.Checked = setPin;
+                checkBox_DSR1.Checked = setPin;
             }
         }
         private void SetPinCTS1(bool setPin)
         {
-            if (this.checkBox_CTS1.InvokeRequired)
+            if (checkBox_CTS1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS1);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_CTS1.Checked = setPin;
+                checkBox_CTS1.Checked = setPin;
             }
         }
         private void SetPinRING1(bool setPin)
         {
-            if (this.checkBox_RI1.InvokeRequired)
+            if (checkBox_RI1.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING1);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_RI1.Checked = setPin;
+                checkBox_RI1.Checked = setPin;
             }
         }
 
         private void SetPinCD2(bool setPin)
         {
-            if (this.checkBox_CD2.InvokeRequired)
+            if (checkBox_CD2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD2);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_CD2.Checked = setPin;
+                checkBox_CD2.Checked = setPin;
             }
         }
         private void SetPinDSR2(bool setPin)
         {
-            if (this.checkBox_DSR2.InvokeRequired)
+            if (checkBox_DSR2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR2);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_DSR2.Checked = setPin;
+                checkBox_DSR2.Checked = setPin;
             }
         }
         private void SetPinCTS2(bool setPin)
         {
-            if (this.checkBox_CTS2.InvokeRequired)
+            if (checkBox_CTS2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS2);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_CTS2.Checked = setPin;
+                checkBox_CTS2.Checked = setPin;
             }
         }
         private void SetPinRING2(bool setPin)
         {
-            if (this.checkBox_RI2.InvokeRequired)
+            if (checkBox_RI2.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING2);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_RI2.Checked = setPin;
+                checkBox_RI2.Checked = setPin;
             }
         }
 
         private void SetPinCD3(bool setPin)
         {
-            if (this.checkBox_CD3.InvokeRequired)
+            if (checkBox_CD3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD3);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_CD3.Checked = setPin;
+                checkBox_CD3.Checked = setPin;
             }
         }
         private void SetPinDSR3(bool setPin)
         {
-            if (this.checkBox_DSR3.InvokeRequired)
+            if (checkBox_DSR3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR3);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_DSR3.Checked = setPin;
+                checkBox_DSR3.Checked = setPin;
             }
         }
         private void SetPinCTS3(bool setPin)
         {
-            if (this.checkBox_CTS3.InvokeRequired)
+            if (checkBox_CTS3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS3);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_CTS3.Checked = setPin;
+                checkBox_CTS3.Checked = setPin;
             }
         }
         private void SetPinRING3(bool setPin)
         {
-            if (this.checkBox_RI3.InvokeRequired)
+            if (checkBox_RI3.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING3);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_RI3.Checked = setPin;
+                checkBox_RI3.Checked = setPin;
             }
         }
 
         private void SetPinCD4(bool setPin)
         {
-            if (this.checkBox_CD4.InvokeRequired)
+            if (checkBox_CD4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCD4);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_CD4.Checked = setPin;
+                checkBox_CD4.Checked = setPin;
             }
         }
         private void SetPinDSR4(bool setPin)
         {
-            if (this.checkBox_DSR4.InvokeRequired)
+            if (checkBox_DSR4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinDSR4);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_DSR4.Checked = setPin;
+                checkBox_DSR4.Checked = setPin;
             }
         }
         private void SetPinCTS4(bool setPin)
         {
-            if (this.checkBox_CTS4.InvokeRequired)
+            if (checkBox_CTS4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinCTS4);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_CTS4.Checked = setPin;
+                checkBox_CTS4.Checked = setPin;
             }
         }
         private void SetPinRING4(bool setPin)
         {
-            if (this.checkBox_RI4.InvokeRequired)
+            if (checkBox_RI4.InvokeRequired)
             {
                 SetPinCallback1 d = new SetPinCallback1(SetPinRING4);
                 BeginInvoke(d, new object[] { setPin });
             }
             else
             {
-                this.checkBox_RI4.Checked = setPin;
+                checkBox_RI4.Checked = setPin;
             }
         }
     }
