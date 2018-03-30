@@ -27,7 +27,7 @@ namespace RS232_monitor
         string CSVFileName = "";
         int CSVLineCount = 0;
         int LogLinesLimit = 100;
-        
+
         public const byte Port1DataIn = 11;
         public const byte Port1DataOut = 12;
         public const byte Port1SignalIn = 13;
@@ -167,7 +167,7 @@ namespace RS232_monitor
             toolStripTextBox_CSVLinesNumber.Text = CSVLineNumberLimit.ToString();
             LogLinesLimit = Properties.Settings.Default.LogLinesLimit;
 
-            terminaltxtToolStripMenuItem1.Enabled = autosaveTXTToolStripMenuItem1.Checked;            
+            terminaltxtToolStripMenuItem1.Enabled = autosaveTXTToolStripMenuItem1.Checked;
 
             //set the codepage to COM-port
             serialPort1.Encoding = Encoding.GetEncoding(Properties.Settings.Default.CodePage);
@@ -2430,7 +2430,7 @@ namespace RS232_monitor
         {
             long.TryParse(LineBreakToolStripTextBox1.Text, out limitTick);
             limitTick = limitTick * 10000;
-            LineBreakToolStripTextBox1.Text = (limitTick/10000).ToString();
+            LineBreakToolStripTextBox1.Text = (limitTick / 10000).ToString();
         }
 
         private void AutosaveCSVToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -2546,6 +2546,7 @@ namespace RS232_monitor
                         }
                     }
                     if (logToTextToolStripMenuItem.Checked == true) SetText(tmpBuffer);
+
                     oldTicks = DateTime.Now.Ticks;
                 }
             }
