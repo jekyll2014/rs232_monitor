@@ -27,8 +27,7 @@ namespace RS232_monitor
         string CSVFileName = "";
         int CSVLineCount = 0;
         int LogLinesLimit = 100;
-
-
+        
         public const byte Port1DataIn = 11;
         public const byte Port1DataOut = 12;
         public const byte Port1SignalIn = 13;
@@ -61,6 +60,9 @@ namespace RS232_monitor
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            toolStripTextBox_CSVLinesNumber.LostFocus += ToolStripTextBox_CSVLinesNumber_Leave;
+            LineBreakToolStripTextBox1.LostFocus += LineBreakToolStripTextBox1_Leave;
+
             dataGridView.DataSource = CSVdataTable;
             //create columns
             DataColumn colDate;
@@ -132,51 +134,55 @@ namespace RS232_monitor
             column.Width = 30;
 
             //load settings
-            textBox_command.Text = RS232_monitor.Properties.Settings.Default.DefaultCommand;
-            checkBox_commandhex.Checked = RS232_monitor.Properties.Settings.Default.DefaultCommandHex;
-            textBox_params.Text = RS232_monitor.Properties.Settings.Default.DefaultParameter;
-            checkBox_paramhex.Checked = RS232_monitor.Properties.Settings.Default.DefaultParamHex;
-            checkBox_cr.Checked = RS232_monitor.Properties.Settings.Default.addCR;
-            checkBox_lf.Checked = RS232_monitor.Properties.Settings.Default.addLF;
-            checkBox_suff.Checked = RS232_monitor.Properties.Settings.Default.addSuff;
-            textBox_suff.Text = RS232_monitor.Properties.Settings.Default.SuffText;
-            checkBox_suffhex.Checked = RS232_monitor.Properties.Settings.Default.DefaultSuffHex;
-            checkBox_insPin.Checked = RS232_monitor.Properties.Settings.Default.LogSignal;
-            checkBox_insTime.Checked = RS232_monitor.Properties.Settings.Default.LogTime;
-            checkBox_insDir.Checked = RS232_monitor.Properties.Settings.Default.LogDir;
-            checkBox_portName.Checked = RS232_monitor.Properties.Settings.Default.LogPortName;
-            checkBox_displayPort1hex.Checked = RS232_monitor.Properties.Settings.Default.HexPort1;
-            checkBox_displayPort2hex.Checked = RS232_monitor.Properties.Settings.Default.HexPort2;
-            checkBox_displayPort3hex.Checked = RS232_monitor.Properties.Settings.Default.HexPort3;
-            checkBox_displayPort4hex.Checked = RS232_monitor.Properties.Settings.Default.HexPort4;
-            textBox_port1Name.Text = RS232_monitor.Properties.Settings.Default.Port1Name;
-            textBox_port2Name.Text = RS232_monitor.Properties.Settings.Default.Port2Name;
-            textBox_port3Name.Text = RS232_monitor.Properties.Settings.Default.Port3Name;
-            textBox_port4Name.Text = RS232_monitor.Properties.Settings.Default.Port4Name;
-            logToGridToolStripMenuItem.Checked = RS232_monitor.Properties.Settings.Default.LogGrid;
-            autoscrollToolStripMenuItem.Checked = RS232_monitor.Properties.Settings.Default.AutoScroll;
-            lineWrapToolStripMenuItem.Checked = RS232_monitor.Properties.Settings.Default.LineWrap;
-            autosaveTXTToolStripMenuItem1.Checked = RS232_monitor.Properties.Settings.Default.AutoLogTXT;
-            terminaltxtToolStripMenuItem1.Text = RS232_monitor.Properties.Settings.Default.TXTlogFile;
-            autosaveCSVToolStripMenuItem1.Checked = RS232_monitor.Properties.Settings.Default.AutoLogCSV;
-            LineBreakToolStripTextBox1.Text = RS232_monitor.Properties.Settings.Default.LineBreakTimeout.ToString();
-            limitTick = RS232_monitor.Properties.Settings.Default.LineBreakTimeout * 10000;
-            CSVLineNumberLimit = RS232_monitor.Properties.Settings.Default.CSVLineNumber;
+            textBox_command.Text = Properties.Settings.Default.DefaultCommand;
+            checkBox_commandhex.Checked = Properties.Settings.Default.DefaultCommandHex;
+            textBox_params.Text = Properties.Settings.Default.DefaultParameter;
+            checkBox_paramhex.Checked = Properties.Settings.Default.DefaultParamHex;
+            checkBox_cr.Checked = Properties.Settings.Default.addCR;
+            checkBox_lf.Checked = Properties.Settings.Default.addLF;
+            checkBox_suff.Checked = Properties.Settings.Default.addSuff;
+            textBox_suff.Text = Properties.Settings.Default.SuffText;
+            checkBox_suffhex.Checked = Properties.Settings.Default.DefaultSuffHex;
+            checkBox_insPin.Checked = Properties.Settings.Default.LogSignal;
+            checkBox_insTime.Checked = Properties.Settings.Default.LogTime;
+            checkBox_insDir.Checked = Properties.Settings.Default.LogDir;
+            checkBox_portName.Checked = Properties.Settings.Default.LogPortName;
+            checkBox_displayPort1hex.Checked = Properties.Settings.Default.HexPort1;
+            checkBox_displayPort2hex.Checked = Properties.Settings.Default.HexPort2;
+            checkBox_displayPort3hex.Checked = Properties.Settings.Default.HexPort3;
+            checkBox_displayPort4hex.Checked = Properties.Settings.Default.HexPort4;
+            textBox_port1Name.Text = Properties.Settings.Default.Port1Name;
+            textBox_port2Name.Text = Properties.Settings.Default.Port2Name;
+            textBox_port3Name.Text = Properties.Settings.Default.Port3Name;
+            textBox_port4Name.Text = Properties.Settings.Default.Port4Name;
+            logToGridToolStripMenuItem.Checked = Properties.Settings.Default.LogGrid;
+            autoscrollToolStripMenuItem.Checked = Properties.Settings.Default.AutoScroll;
+            lineWrapToolStripMenuItem.Checked = Properties.Settings.Default.LineWrap;
+            autosaveTXTToolStripMenuItem1.Checked = Properties.Settings.Default.AutoLogTXT;
+            terminaltxtToolStripMenuItem1.Text = Properties.Settings.Default.TXTlogFile;
+            autosaveCSVToolStripMenuItem1.Checked = Properties.Settings.Default.AutoLogCSV;
+            LineBreakToolStripTextBox1.Text = Properties.Settings.Default.LineBreakTimeout.ToString();
+            limitTick = Properties.Settings.Default.LineBreakTimeout * 10000;
+            CSVLineNumberLimit = Properties.Settings.Default.CSVLineNumber;
             toolStripTextBox_CSVLinesNumber.Text = CSVLineNumberLimit.ToString();
             LogLinesLimit = Properties.Settings.Default.LogLinesLimit;
 
-            if (autosaveTXTToolStripMenuItem1.Checked == true) terminaltxtToolStripMenuItem1.Enabled = true;
-            else terminaltxtToolStripMenuItem1.Enabled = false;
+            terminaltxtToolStripMenuItem1.Enabled = autosaveTXTToolStripMenuItem1.Checked;            
 
             //set the codepage to COM-port
-            serialPort1.Encoding = Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage);
-            serialPort2.Encoding = Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage);
-            serialPort3.Encoding = Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage);
-            serialPort4.Encoding = Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage);
+            serialPort1.Encoding = Encoding.GetEncoding(Properties.Settings.Default.CodePage);
+            serialPort2.Encoding = Encoding.GetEncoding(Properties.Settings.Default.CodePage);
+            serialPort3.Encoding = Encoding.GetEncoding(Properties.Settings.Default.CodePage);
+            serialPort4.Encoding = Encoding.GetEncoding(Properties.Settings.Default.CodePage);
             SerialPopulate();
         }
 
-        private void button_openport_Click(object sender, EventArgs e)
+        private void ToolStripTextBox_CSVLinesNumber_LostFocus(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Button_openport_Click(object sender, EventArgs e)
         {
             checkBox_DTR1.Checked = false;
             checkBox_DTR2.Checked = false;
@@ -225,8 +231,8 @@ namespace RS232_monitor
                 serialPort1.Handshake = (Handshake)Enum.Parse(typeof(Handshake), comboBox_handshake1.Text);
                 serialPort1.Parity = (Parity)Enum.Parse(typeof(Parity), comboBox_parity1.Text);
                 serialPort1.StopBits = (StopBits)Enum.Parse(typeof(StopBits), comboBox_stopbits1.Text);
-                serialPort1.ReadTimeout = RS232_monitor.Properties.Settings.Default.ReceiveTimeOut;
-                serialPort1.WriteTimeout = RS232_monitor.Properties.Settings.Default.SendTimeOut;
+                serialPort1.ReadTimeout = Properties.Settings.Default.ReceiveTimeOut;
+                serialPort1.WriteTimeout = Properties.Settings.Default.SendTimeOut;
                 serialPort1.ReadBufferSize = 8192;
                 try
                 {
@@ -265,8 +271,8 @@ namespace RS232_monitor
 
                     return;
                 }
-                if (checkBox_insPin.Checked) serialPort1.PinChanged += serialPort1_PinChanged;
-                serialPort1.DataReceived += serialPort1_DataReceived;
+                if (checkBox_insPin.Checked) serialPort1.PinChanged += SerialPort1_PinChanged;
+                serialPort1.DataReceived += SerialPort1_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -327,8 +333,8 @@ namespace RS232_monitor
                 serialPort2.Handshake = (Handshake)Enum.Parse(typeof(Handshake), comboBox_handshake2.Text);
                 serialPort2.Parity = (Parity)Enum.Parse(typeof(Parity), comboBox_parity2.Text);
                 serialPort2.StopBits = (StopBits)Enum.Parse(typeof(StopBits), comboBox_stopbits2.Text);
-                serialPort2.ReadTimeout = RS232_monitor.Properties.Settings.Default.ReceiveTimeOut;
-                serialPort2.WriteTimeout = RS232_monitor.Properties.Settings.Default.SendTimeOut;
+                serialPort2.ReadTimeout = Properties.Settings.Default.ReceiveTimeOut;
+                serialPort2.WriteTimeout = Properties.Settings.Default.SendTimeOut;
                 serialPort2.ReadBufferSize = 8192;
                 try
                 {
@@ -366,8 +372,8 @@ namespace RS232_monitor
                     comboBox_stopbits4.Enabled = true;
                     return;
                 }
-                if (checkBox_insPin.Checked) serialPort2.PinChanged += serialPort2_PinChanged;
-                serialPort2.DataReceived += serialPort2_DataReceived;
+                if (checkBox_insPin.Checked) serialPort2.PinChanged += SerialPort2_PinChanged;
+                serialPort2.DataReceived += SerialPort2_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -427,8 +433,8 @@ namespace RS232_monitor
                 serialPort3.Handshake = (Handshake)Enum.Parse(typeof(Handshake), comboBox_handshake3.Text);
                 serialPort3.Parity = (Parity)Enum.Parse(typeof(Parity), comboBox_parity3.Text);
                 serialPort3.StopBits = (StopBits)Enum.Parse(typeof(StopBits), comboBox_stopbits3.Text);
-                serialPort3.ReadTimeout = RS232_monitor.Properties.Settings.Default.ReceiveTimeOut;
-                serialPort3.WriteTimeout = RS232_monitor.Properties.Settings.Default.SendTimeOut;
+                serialPort3.ReadTimeout = Properties.Settings.Default.ReceiveTimeOut;
+                serialPort3.WriteTimeout = Properties.Settings.Default.SendTimeOut;
                 serialPort3.ReadBufferSize = 8192;
                 try
                 {
@@ -466,8 +472,8 @@ namespace RS232_monitor
                     comboBox_stopbits4.Enabled = true;
                     return;
                 }
-                if (checkBox_insPin.Checked) serialPort3.PinChanged += serialPort3_PinChanged;
-                serialPort3.DataReceived += serialPort3_DataReceived;
+                if (checkBox_insPin.Checked) serialPort3.PinChanged += SerialPort3_PinChanged;
+                serialPort3.DataReceived += SerialPort3_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -527,8 +533,8 @@ namespace RS232_monitor
                 serialPort4.Handshake = (Handshake)Enum.Parse(typeof(Handshake), comboBox_handshake4.Text);
                 serialPort4.Parity = (Parity)Enum.Parse(typeof(Parity), comboBox_parity4.Text);
                 serialPort4.StopBits = (StopBits)Enum.Parse(typeof(StopBits), comboBox_stopbits4.Text);
-                serialPort4.ReadTimeout = RS232_monitor.Properties.Settings.Default.ReceiveTimeOut;
-                serialPort4.WriteTimeout = RS232_monitor.Properties.Settings.Default.SendTimeOut;
+                serialPort4.ReadTimeout = Properties.Settings.Default.ReceiveTimeOut;
+                serialPort4.WriteTimeout = Properties.Settings.Default.SendTimeOut;
                 serialPort4.ReadBufferSize = 8192;
                 try
                 {
@@ -566,8 +572,8 @@ namespace RS232_monitor
                     comboBox_stopbits4.Enabled = true;
                     return;
                 }
-                if (checkBox_insPin.Checked) serialPort4.PinChanged += serialPort4_PinChanged;
-                serialPort4.DataReceived += serialPort4_DataReceived;
+                if (checkBox_insPin.Checked) serialPort4.PinChanged += SerialPort4_PinChanged;
+                serialPort4.DataReceived += SerialPort4_DataReceived;
                 button_refresh.Enabled = false;
                 button_closeport.Enabled = true;
                 button_openport.Enabled = false;
@@ -594,10 +600,10 @@ namespace RS232_monitor
 
             if (checkBox_sendPort1.Checked == false && checkBox_sendPort2.Checked == false && checkBox_sendPort3.Checked == false && checkBox_sendPort4.Checked == false) button_send.Enabled = false;
             else if (serialPort1.IsOpen == true || serialPort2.IsOpen == true || serialPort3.IsOpen == true || serialPort4.IsOpen == true) button_send.Enabled = true;
-            checkBox_portName_CheckedChanged(this, EventArgs.Empty);
+            CheckBox_portName_CheckedChanged(this, EventArgs.Empty);
         }
 
-        private void button_closeport_Click(object sender, EventArgs e)
+        private void Button_closeport_Click(object sender, EventArgs e)
         {
             try
             {
@@ -631,14 +637,14 @@ namespace RS232_monitor
             {
                 MessageBox.Show("Error closing port " + serialPort4.PortName + ": " + ex.Message);
             }
-            serialPort1.DataReceived -= serialPort1_DataReceived;
-            serialPort1.PinChanged -= serialPort1_PinChanged;
-            serialPort2.DataReceived -= serialPort2_DataReceived;
-            serialPort2.PinChanged -= serialPort2_PinChanged;
-            serialPort3.DataReceived -= serialPort3_DataReceived;
-            serialPort3.PinChanged -= serialPort3_PinChanged;
-            serialPort4.DataReceived -= serialPort4_DataReceived;
-            serialPort4.PinChanged -= serialPort4_PinChanged;
+            serialPort1.DataReceived -= SerialPort1_DataReceived;
+            serialPort1.PinChanged -= SerialPort1_PinChanged;
+            serialPort2.DataReceived -= SerialPort2_DataReceived;
+            serialPort2.PinChanged -= SerialPort2_PinChanged;
+            serialPort3.DataReceived -= SerialPort3_DataReceived;
+            serialPort3.PinChanged -= SerialPort3_PinChanged;
+            serialPort4.DataReceived -= SerialPort4_DataReceived;
+            serialPort4.PinChanged -= SerialPort4_PinChanged;
 
             comboBox_portname1.Enabled = true;
             comboBox_portspeed1.Enabled = true;
@@ -686,7 +692,7 @@ namespace RS232_monitor
             checkBox_RTS4.Enabled = false;
         }
 
-        private void button_send_Click(object sender, EventArgs e)
+        private void Button_send_Click(object sender, EventArgs e)
         {
             if (textBox_senddata.Text != "")
             {
@@ -723,8 +729,11 @@ namespace RS232_monitor
                     //if (checkBox_insDir.Checked == true) outStr += portname1 + ">> ";
                     if (checkBox_displayPort1hex.Checked == true) outStr += textBox_senddata.Text;
                     else outStr += Accessory.ConvertHexToString(textBox_senddata.Text);
-                    if (outStr != "") collectBuffer(outStr, Port1DataOut, dataRowTX1["Date"] + " " + dataRowTX1["Time"] + "." + dataRowTX1["Milis"]);
-                    if (autosaveCSVToolStripMenuItem1.Checked == true && dataRowTX1["Data"].ToString() != "") CSVcollectBuffer(dataRowTX1["Date"] + "," + dataRowTX1["Time"] + "," + dataRowTX1["Milis"] + "," + dataRowTX1["Port"] + "," + dataRowTX1["Dir"] + "," + dataRowTX1["Data"] + "," + dataRowTX1["Signal"] + "," + dataRowTX1["Mark"] + "\r\n");
+                    if (outStr != "")
+                    {
+                        CollectBuffer(outStr, Port1DataOut, dataRowTX1["Date"] + " " + dataRowTX1["Time"] + "." + dataRowTX1["Milis"]);
+                        if (autosaveCSVToolStripMenuItem1.Checked == true && dataRowTX1["Data"].ToString() != "") CSVcollectBuffer(dataRowTX1["Date"] + "," + dataRowTX1["Time"] + "," + dataRowTX1["Milis"] + "," + dataRowTX1["Port"] + "," + dataRowTX1["Dir"] + "," + dataRowTX1["Data"] + "," + dataRowTX1["Signal"] + "," + dataRowTX1["Mark"] + "\r\n");
+                    }
                 }
                 if (checkBox_sendPort2.Checked == true && serialPort2.IsOpen)
                 {
@@ -760,8 +769,11 @@ namespace RS232_monitor
                     //if (checkBox_insDir.Checked == true) outStr += portname2 + ">> ";
                     if (checkBox_displayPort2hex.Checked == true) outStr += textBox_senddata.Text;
                     else outStr += Accessory.ConvertHexToString(textBox_senddata.Text);
-                    collectBuffer(outStr, Port2DataOut, dataRowTX2["Date"] + " " + dataRowTX2["Time"] + "." + dataRowTX2["Milis"]);
-                    if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowTX2["Date"] + "," + dataRowTX2["Time"] + "," + dataRowTX2["Milis"] + "," + dataRowTX2["Port"] + "," + dataRowTX2["Dir"] + "," + dataRowTX2["Data"] + "," + dataRowTX2["Signal"] + "," + dataRowTX2["Mark"] + "\r\n");
+                    if (outStr != "")
+                    {
+                        CollectBuffer(outStr, Port2DataOut, dataRowTX2["Date"] + " " + dataRowTX2["Time"] + "." + dataRowTX2["Milis"]);
+                        if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowTX2["Date"] + "," + dataRowTX2["Time"] + "," + dataRowTX2["Milis"] + "," + dataRowTX2["Port"] + "," + dataRowTX2["Dir"] + "," + dataRowTX2["Data"] + "," + dataRowTX2["Signal"] + "," + dataRowTX2["Mark"] + "\r\n");
+                    }
                 }
                 if (checkBox_sendPort3.Checked == true && serialPort3.IsOpen)
                 {
@@ -797,8 +809,11 @@ namespace RS232_monitor
                     //if (checkBox_insDir.Checked == true) outStr += portname2 + ">> ";
                     if (checkBox_displayPort3hex.Checked == true) outStr += textBox_senddata.Text;
                     else outStr += Accessory.ConvertHexToString(textBox_senddata.Text);
-                    collectBuffer(outStr, Port3DataOut, dataRowTX3["Date"] + " " + dataRowTX3["Time"] + "." + dataRowTX3["Milis"]);
-                    if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowTX3["Date"] + "," + dataRowTX3["Time"] + "," + dataRowTX3["Milis"] + "," + dataRowTX3["Port"] + "," + dataRowTX3["Dir"] + "," + dataRowTX3["Data"] + "," + dataRowTX3["Signal"] + "," + dataRowTX3["Mark"] + "\r\n");
+                    if (outStr != "")
+                    {
+                        CollectBuffer(outStr, Port3DataOut, dataRowTX3["Date"] + " " + dataRowTX3["Time"] + "." + dataRowTX3["Milis"]);
+                        if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowTX3["Date"] + "," + dataRowTX3["Time"] + "," + dataRowTX3["Milis"] + "," + dataRowTX3["Port"] + "," + dataRowTX3["Dir"] + "," + dataRowTX3["Data"] + "," + dataRowTX3["Signal"] + "," + dataRowTX3["Mark"] + "\r\n");
+                    }
                 }
                 if (checkBox_sendPort4.Checked == true && serialPort4.IsOpen)
                 {
@@ -834,13 +849,16 @@ namespace RS232_monitor
                     //if (checkBox_insDir.Checked == true) outStr += portname2 + ">> ";
                     if (checkBox_displayPort4hex.Checked == true) outStr += textBox_senddata.Text;
                     else outStr += Accessory.ConvertHexToString(textBox_senddata.Text);
-                    collectBuffer(outStr, Port4DataOut, dataRowTX4["Date"] + " " + dataRowTX4["Time"] + "." + dataRowTX4["Milis"]);
-                    if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowTX4["Date"] + "," + dataRowTX4["Time"] + "," + dataRowTX4["Milis"] + "," + dataRowTX4["Port"] + "," + dataRowTX4["Dir"] + "," + dataRowTX4["Data"] + "," + dataRowTX4["Signal"] + "," + dataRowTX4["Mark"] + "\r\n");
+                    if (outStr != "")
+                    {
+                        CollectBuffer(outStr, Port4DataOut, dataRowTX4["Date"] + " " + dataRowTX4["Time"] + "." + dataRowTX4["Milis"]);
+                        if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowTX4["Date"] + "," + dataRowTX4["Time"] + "," + dataRowTX4["Milis"] + "," + dataRowTX4["Port"] + "," + dataRowTX4["Dir"] + "," + dataRowTX4["Data"] + "," + dataRowTX4["Signal"] + "," + dataRowTX4["Mark"] + "\r\n");
+                    }
                 }
             }
         }
 
-        private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        private void SerialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             List<byte> rx1 = new List<byte>();
             DataRow dataRowRX1 = CSVdataTable.NewRow();
@@ -871,12 +889,12 @@ namespace RS232_monitor
             //if (checkBox_insTime.Checked == true) outStr1 += dataRowRX1["Date"] + " " + dataRowRX1["Time"] + "." + dataRowRX1["Milis"] + " ";
             //if (checkBox_insDir.Checked == true) outStr1 += portname1 + "<< ";
             if (checkBox_displayPort1hex.Checked == true) outStr1 += dataRowRX1["Data"];
-            else outStr1 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx1.ToArray(), 0, rx1.Count);
-            collectBuffer(outStr1, Port1DataIn, dataRowRX1["Date"] + " " + dataRowRX1["Time"] + "." + dataRowRX1["Milis"]);
+            else outStr1 += Encoding.GetEncoding(Properties.Settings.Default.CodePage).GetString(rx1.ToArray(), 0, rx1.Count);
+            CollectBuffer(outStr1, Port1DataIn, dataRowRX1["Date"] + " " + dataRowRX1["Time"] + "." + dataRowRX1["Milis"]);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowRX1["Date"] + "," + dataRowRX1["Time"] + "," + dataRowRX1["Milis"] + "," + dataRowRX1["Port"] + "," + dataRowRX1["Dir"] + "," + dataRowRX1["Data"] + "," + dataRowRX1["Signal"] + "," + dataRowRX1["Mark"] + "\r\n");
         }
 
-        private void serialPort2_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void SerialPort2_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             List<byte> rx2 = new List<byte>();
             DataRow dataRowRX2 = CSVdataTable.NewRow();
@@ -907,12 +925,12 @@ namespace RS232_monitor
             //if (checkBox_insTime.Checked == true) outStr2 += dataRowRX2["Date"] + " " + dataRowRX2["Time"] + "." + dataRowRX2["Milis"] + " ";
             //if (checkBox_insDir.Checked == true) outStr2 += portname2 + "<< ";
             if (checkBox_displayPort2hex.Checked == true) outStr2 += dataRowRX2["Data"];
-            else outStr2 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx2.ToArray(), 0, rx2.Count);
-            collectBuffer(outStr2, Port2DataIn, dataRowRX2["Date"] + " " + dataRowRX2["Time"] + "." + dataRowRX2["Milis"]);
+            else outStr2 += System.Text.Encoding.GetEncoding(Properties.Settings.Default.CodePage).GetString(rx2.ToArray(), 0, rx2.Count);
+            CollectBuffer(outStr2, Port2DataIn, dataRowRX2["Date"] + " " + dataRowRX2["Time"] + "." + dataRowRX2["Milis"]);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowRX2["Date"] + "," + dataRowRX2["Time"] + "," + dataRowRX2["Milis"] + "," + dataRowRX2["Port"] + "," + dataRowRX2["Dir"] + "," + dataRowRX2["Data"] + "," + dataRowRX2["Signal"] + "," + dataRowRX2["Mark"] + "\r\n");
         }
 
-        private void serialPort3_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void SerialPort3_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             List<byte> rx3 = new List<byte>();
             DataRow dataRowRX3 = CSVdataTable.NewRow();
@@ -943,12 +961,12 @@ namespace RS232_monitor
             //if (checkBox_insTime.Checked == true) outStr2 += dataRowRX2["Date"] + " " + dataRowRX2["Time"] + "." + dataRowRX2["Milis"] + " ";
             //kif (checkBox_insDir.Checked == true) outStr2 += portname2 + "<< ";
             if (checkBox_displayPort3hex.Checked == true) outStr3 += dataRowRX3["Data"];
-            else outStr3 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx3.ToArray(), 0, rx3.Count);
-            collectBuffer(outStr3, Port3DataIn, dataRowRX3["Date"] + " " + dataRowRX3["Time"] + "." + dataRowRX3["Milis"]);
+            else outStr3 += System.Text.Encoding.GetEncoding(Properties.Settings.Default.CodePage).GetString(rx3.ToArray(), 0, rx3.Count);
+            CollectBuffer(outStr3, Port3DataIn, dataRowRX3["Date"] + " " + dataRowRX3["Time"] + "." + dataRowRX3["Milis"]);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowRX3["Date"] + "," + dataRowRX3["Time"] + "," + dataRowRX3["Milis"] + "," + dataRowRX3["Port"] + "," + dataRowRX3["Dir"] + "," + dataRowRX3["Data"] + "," + dataRowRX3["Signal"] + "," + dataRowRX3["Mark"] + "\r\n");
         }
 
-        private void serialPort4_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void SerialPort4_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             List<byte> rx4 = new List<byte>();
             DataRow dataRowRX4 = CSVdataTable.NewRow();
@@ -979,12 +997,12 @@ namespace RS232_monitor
             //if (checkBox_insTime.Checked == true) outStr2 += dataRowRX2["Date"] + " " + dataRowRX2["Time"] + "." + dataRowRX2["Milis"] + " ";
             //kif (checkBox_insDir.Checked == true) outStr2 += portname2 + "<< ";
             if (checkBox_displayPort4hex.Checked == true) outStr4 += dataRowRX4["Data"];
-            else outStr4 += System.Text.Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage).GetString(rx4.ToArray(), 0, rx4.Count);
-            collectBuffer(outStr4, Port4DataIn, dataRowRX4["Date"] + " " + dataRowRX4["Time"] + "." + dataRowRX4["Milis"]);
+            else outStr4 += System.Text.Encoding.GetEncoding(Properties.Settings.Default.CodePage).GetString(rx4.ToArray(), 0, rx4.Count);
+            CollectBuffer(outStr4, Port4DataIn, dataRowRX4["Date"] + " " + dataRowRX4["Time"] + "." + dataRowRX4["Milis"]);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowRX4["Date"] + "," + dataRowRX4["Time"] + "," + dataRowRX4["Milis"] + "," + dataRowRX4["Port"] + "," + dataRowRX4["Dir"] + "," + dataRowRX4["Data"] + "," + dataRowRX4["Signal"] + "," + dataRowRX4["Mark"] + "\r\n");
         }
 
-        private void serialPort1_PinChanged(object sender, SerialPinChangedEventArgs e)
+        private void SerialPort1_PinChanged(object sender, SerialPinChangedEventArgs e)
         {
             SetPinCD1(serialPort1.CDHolding);
             SetPinDSR1(serialPort1.DsrHolding);
@@ -1048,14 +1066,14 @@ namespace RS232_monitor
             }
             if (outStr != "")
             {
-                if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port1SignalIn, dataRowPIN1["Date"] + " " + dataRowPIN1["Time"] + "." + dataRowPIN1["Milis"]);
+                if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port1SignalIn, dataRowPIN1["Date"] + " " + dataRowPIN1["Time"] + "." + dataRowPIN1["Milis"]);
                 dataRowPIN1["Signal"] = outStr;
                 if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN1);
                 if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN1["Date"] + "," + dataRowPIN1["Time"] + "," + dataRowPIN1["Milis"] + "," + dataRowPIN1["Port"] + "," + dataRowPIN1["Dir"] + "," + dataRowPIN1["Data"] + "," + dataRowPIN1["Signal"] + "," + dataRowPIN1["Mark"] + "\r\n");
             }
         }
 
-        private void serialPort2_PinChanged(object sender, SerialPinChangedEventArgs e)
+        private void SerialPort2_PinChanged(object sender, SerialPinChangedEventArgs e)
         {
             SetPinCD2(serialPort2.CDHolding);
             SetPinDSR2(serialPort2.DsrHolding);
@@ -1120,14 +1138,14 @@ namespace RS232_monitor
             }
             if (outStr != "")
             {
-                if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port2SignalIn, dataRowPIN2["Date"] + " " + dataRowPIN2["Time"] + "." + dataRowPIN2["Milis"]);
+                if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port2SignalIn, dataRowPIN2["Date"] + " " + dataRowPIN2["Time"] + "." + dataRowPIN2["Milis"]);
                 dataRowPIN2["Signal"] = outStr;
                 if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN2);
                 if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN2["Date"] + "," + dataRowPIN2["Time"] + "," + dataRowPIN2["Milis"] + "," + dataRowPIN2["Port"] + "," + dataRowPIN2["Dir"] + "," + dataRowPIN2["Data"] + "," + dataRowPIN2["Signal"] + "," + dataRowPIN2["Mark"] + "\r\n");
             }
         }
 
-        private void serialPort3_PinChanged(object sender, SerialPinChangedEventArgs e)
+        private void SerialPort3_PinChanged(object sender, SerialPinChangedEventArgs e)
         {
             SetPinCD3(serialPort3.CDHolding);
             SetPinDSR3(serialPort3.DsrHolding);
@@ -1191,14 +1209,14 @@ namespace RS232_monitor
             }
             if (outStr != "")
             {
-                if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port3SignalIn, dataRowPIN3["Date"] + " " + dataRowPIN3["Time"] + "." + dataRowPIN3["Milis"]);
+                if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port3SignalIn, dataRowPIN3["Date"] + " " + dataRowPIN3["Time"] + "." + dataRowPIN3["Milis"]);
                 dataRowPIN3["Signal"] = outStr;
                 if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN3);
                 if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN3["Date"] + "," + dataRowPIN3["Time"] + "," + dataRowPIN3["Milis"] + "," + dataRowPIN3["Port"] + "," + dataRowPIN3["Dir"] + "," + dataRowPIN3["Data"] + "," + dataRowPIN3["Signal"] + "," + dataRowPIN3["Mark"] + "\r\n");
             }
         }
 
-        private void serialPort4_PinChanged(object sender, SerialPinChangedEventArgs e)////
+        private void SerialPort4_PinChanged(object sender, SerialPinChangedEventArgs e)////
         {
             SetPinCD4(serialPort4.CDHolding);
             SetPinDSR4(serialPort4.DsrHolding);
@@ -1262,14 +1280,14 @@ namespace RS232_monitor
             }
             if (outStr != "")
             {
-                if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port4SignalIn, dataRowPIN4["Date"] + " " + dataRowPIN4["Time"] + "." + dataRowPIN4["Milis"]);
+                if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port4SignalIn, dataRowPIN4["Date"] + " " + dataRowPIN4["Time"] + "." + dataRowPIN4["Milis"]);
                 dataRowPIN4["Signal"] = outStr;
                 if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN4);
                 if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN4["Date"] + "," + dataRowPIN4["Time"] + "," + dataRowPIN4["Milis"] + "," + dataRowPIN4["Port"] + "," + dataRowPIN4["Dir"] + "," + dataRowPIN4["Data"] + "," + dataRowPIN4["Signal"] + "," + dataRowPIN4["Mark"] + "\r\n");
             }
         }
 
-        private void serialPort1_ErrorReceived(object sender, System.IO.Ports.SerialErrorReceivedEventArgs e)
+        private void SerialPort1_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
         {
             //MessageBox.Show("Port1 error: " + e.EventType);
             DataRow dataRowPIN1 = null;
@@ -1287,13 +1305,13 @@ namespace RS232_monitor
             }
             dataRowPIN1["Mark"] = checkBox_Mark.Checked;
             string outStr = "<!" + portname1 + " error: " + e.EventType + "!>";
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port1SignalIn, dataRowPIN1["Date"] + " " + dataRowPIN1["Time"] + "." + dataRowPIN1["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port1SignalIn, dataRowPIN1["Date"] + " " + dataRowPIN1["Time"] + "." + dataRowPIN1["Milis"]);
             dataRowPIN1["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN1);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN1["Date"] + "," + dataRowPIN1["Time"] + "," + dataRowPIN1["Milis"] + "," + dataRowPIN1["Port"] + "," + dataRowPIN1["Dir"] + "," + dataRowPIN1["Data"] + "," + dataRowPIN1["Signal"] + "," + dataRowPIN1["Mark"] + "\r\n");
         }
 
-        private void serialPort2_ErrorReceived(object sender, System.IO.Ports.SerialErrorReceivedEventArgs e)
+        private void SerialPort2_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
         {
             //MessageBox.Show("Port2 error: " + e.EventType);
             DataRow dataRowPIN2 = null;
@@ -1311,13 +1329,13 @@ namespace RS232_monitor
             }
             dataRowPIN2["Mark"] = checkBox_Mark.Checked;
             string outStr = "<!" + portname1 + " error: " + e.EventType + "!>";
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port2SignalIn, dataRowPIN2["Date"] + " " + dataRowPIN2["Time"] + "." + dataRowPIN2["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port2SignalIn, dataRowPIN2["Date"] + " " + dataRowPIN2["Time"] + "." + dataRowPIN2["Milis"]);
             dataRowPIN2["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN2);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN2["Date"] + "," + dataRowPIN2["Time"] + "," + dataRowPIN2["Milis"] + "," + dataRowPIN2["Port"] + "," + dataRowPIN2["Dir"] + "," + dataRowPIN2["Data"] + "," + dataRowPIN2["Signal"] + "," + dataRowPIN2["Mark"] + "\r\n");
         }
 
-        private void serialPort3_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        private void SerialPort3_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
         {
             //MessageBox.Show("Port2 error: " + e.EventType);
             DataRow dataRowPIN3 = null;
@@ -1335,13 +1353,13 @@ namespace RS232_monitor
             }
             dataRowPIN3["Mark"] = checkBox_Mark.Checked;
             string outStr = "<!" + portname1 + " error: " + e.EventType + "!>";
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port3SignalIn, dataRowPIN3["Date"] + " " + dataRowPIN3["Time"] + "." + dataRowPIN3["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port3SignalIn, dataRowPIN3["Date"] + " " + dataRowPIN3["Time"] + "." + dataRowPIN3["Milis"]);
             dataRowPIN3["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN3);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN3["Date"] + "," + dataRowPIN3["Time"] + "," + dataRowPIN3["Milis"] + "," + dataRowPIN3["Port"] + "," + dataRowPIN3["Dir"] + "," + dataRowPIN3["Data"] + "," + dataRowPIN3["Signal"] + "," + dataRowPIN3["Mark"] + "\r\n");
         }
 
-        private void serialPort4_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        private void SerialPort4_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
         {
             //MessageBox.Show("Port2 error: " + e.EventType);
             DataRow dataRowPIN4 = null;
@@ -1359,13 +1377,13 @@ namespace RS232_monitor
             }
             dataRowPIN4["Mark"] = checkBox_Mark.Checked;
             string outStr = "<!" + portname1 + " error: " + e.EventType + "!>";
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port4SignalIn, dataRowPIN4["Date"] + " " + dataRowPIN4["Time"] + "." + dataRowPIN4["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port4SignalIn, dataRowPIN4["Date"] + " " + dataRowPIN4["Time"] + "." + dataRowPIN4["Milis"]);
             dataRowPIN4["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN4);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN4["Date"] + "," + dataRowPIN4["Time"] + "," + dataRowPIN4["Milis"] + "," + dataRowPIN4["Port"] + "," + dataRowPIN4["Dir"] + "," + dataRowPIN4["Data"] + "," + dataRowPIN4["Signal"] + "," + dataRowPIN4["Mark"] + "\r\n");
         }
 
-        private void checkBox_DTR1_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_DTR1_CheckedChanged(object sender, EventArgs e)
         {
             serialPort1.DtrEnable = checkBox_DTR1.Checked;
             DataRow dataRowPIN1 = null;
@@ -1393,13 +1411,13 @@ namespace RS232_monitor
                 o_dtr1 = false;
                 outStr += "<" + portname1 + "_DTRv>";
             }
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port1SignalOut, dataRowPIN1["Date"] + " " + dataRowPIN1["Time"] + "." + dataRowPIN1["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port1SignalOut, dataRowPIN1["Date"] + " " + dataRowPIN1["Time"] + "." + dataRowPIN1["Milis"]);
             dataRowPIN1["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN1);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN1["Date"] + "," + dataRowPIN1["Time"] + "," + dataRowPIN1["Milis"] + "," + dataRowPIN1["Port"] + "," + dataRowPIN1["Dir"] + "," + dataRowPIN1["Data"] + "," + dataRowPIN1["Signal"] + "," + dataRowPIN1["Mark"] + "\r\n");
         }
 
-        private void checkBox_DTR2_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_DTR2_CheckedChanged(object sender, EventArgs e)
         {
             serialPort2.DtrEnable = checkBox_DTR2.Checked;
             DataRow dataRowPIN2 = null;
@@ -1427,13 +1445,13 @@ namespace RS232_monitor
                 o_dtr2 = false;
                 outStr += "<" + portname2 + "_DTRv>";
             }
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port2SignalOut, dataRowPIN2["Date"] + " " + dataRowPIN2["Time"] + "." + dataRowPIN2["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port2SignalOut, dataRowPIN2["Date"] + " " + dataRowPIN2["Time"] + "." + dataRowPIN2["Milis"]);
             dataRowPIN2["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN2);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN2["Date"] + "," + dataRowPIN2["Time"] + "," + dataRowPIN2["Milis"] + "," + dataRowPIN2["Port"] + "," + dataRowPIN2["Dir"] + "," + dataRowPIN2["Data"] + "," + dataRowPIN2["Signal"] + "," + dataRowPIN2["Mark"] + "\r\n");
         }
 
-        private void checkBox_DTR3_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_DTR3_CheckedChanged(object sender, EventArgs e)
         {
             serialPort3.DtrEnable = checkBox_DTR3.Checked;
             DataRow dataRowPIN3 = null;
@@ -1461,13 +1479,13 @@ namespace RS232_monitor
                 o_dtr3 = false;
                 outStr += "<" + portname3 + "_DTRv>";
             }
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port3SignalOut, dataRowPIN3["Date"] + " " + dataRowPIN3["Time"] + "." + dataRowPIN3["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port3SignalOut, dataRowPIN3["Date"] + " " + dataRowPIN3["Time"] + "." + dataRowPIN3["Milis"]);
             dataRowPIN3["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN3);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN3["Date"] + "," + dataRowPIN3["Time"] + "," + dataRowPIN3["Milis"] + "," + dataRowPIN3["Port"] + "," + dataRowPIN3["Dir"] + "," + dataRowPIN3["Data"] + "," + dataRowPIN3["Signal"] + "," + dataRowPIN3["Mark"] + "\r\n");
         }
 
-        private void checkBox_DTR4_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_DTR4_CheckedChanged(object sender, EventArgs e)
         {
             serialPort4.DtrEnable = checkBox_DTR4.Checked;
             DataRow dataRowPIN4 = null;
@@ -1495,13 +1513,13 @@ namespace RS232_monitor
                 o_dtr4 = false;
                 outStr += "<" + portname4 + "_DTRv>";
             }
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port4SignalOut, dataRowPIN4["Date"] + " " + dataRowPIN4["Time"] + "." + dataRowPIN4["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port4SignalOut, dataRowPIN4["Date"] + " " + dataRowPIN4["Time"] + "." + dataRowPIN4["Milis"]);
             dataRowPIN4["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN4);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN4["Date"] + "," + dataRowPIN4["Time"] + "," + dataRowPIN4["Milis"] + "," + dataRowPIN4["Port"] + "," + dataRowPIN4["Dir"] + "," + dataRowPIN4["Data"] + "," + dataRowPIN4["Signal"] + "," + dataRowPIN4["Mark"] + "\r\n");
         }
 
-        private void checkBox_RTS1_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_RTS1_CheckedChanged(object sender, EventArgs e)
         {
             serialPort1.RtsEnable = checkBox_RTS1.Checked;
             DataRow dataRowPIN1 = null;
@@ -1529,13 +1547,13 @@ namespace RS232_monitor
                 o_rts1 = false;
                 outStr += "<" + portname1 + "_RTSv>";
             }
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port1SignalOut, dataRowPIN1["Date"] + " " + dataRowPIN1["Time"] + "." + dataRowPIN1["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port1SignalOut, dataRowPIN1["Date"] + " " + dataRowPIN1["Time"] + "." + dataRowPIN1["Milis"]);
             dataRowPIN1["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN1);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN1["Date"] + "," + dataRowPIN1["Time"] + "," + dataRowPIN1["Milis"] + "," + dataRowPIN1["Port"] + "," + dataRowPIN1["Dir"] + "," + dataRowPIN1["Data"] + "," + dataRowPIN1["Signal"] + "," + dataRowPIN1["Mark"] + "\r\n");
         }
 
-        private void checkBox_RTS2_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_RTS2_CheckedChanged(object sender, EventArgs e)
         {
             serialPort2.RtsEnable = checkBox_RTS2.Checked;
             DataRow dataRowPIN2 = null;
@@ -1563,13 +1581,13 @@ namespace RS232_monitor
                 o_rts2 = false;
                 outStr += "<" + portname2 + "_RTSv>";
             }
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port2SignalOut, dataRowPIN2["Date"] + " " + dataRowPIN2["Time"] + "." + dataRowPIN2["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port2SignalOut, dataRowPIN2["Date"] + " " + dataRowPIN2["Time"] + "." + dataRowPIN2["Milis"]);
             dataRowPIN2["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN2);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN2["Date"] + "," + dataRowPIN2["Time"] + "," + dataRowPIN2["Milis"] + "," + dataRowPIN2["Port"] + "," + dataRowPIN2["Dir"] + "," + dataRowPIN2["Data"] + "," + dataRowPIN2["Signal"] + "," + dataRowPIN2["Mark"] + "\r\n");
         }
 
-        private void checkBox_RTS3_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_RTS3_CheckedChanged(object sender, EventArgs e)
         {
             serialPort3.RtsEnable = checkBox_RTS3.Checked;
             DataRow dataRowPIN3 = null;
@@ -1597,13 +1615,13 @@ namespace RS232_monitor
                 o_rts3 = false;
                 outStr += "<" + portname3 + "_RTSv>";
             }
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port3SignalOut, dataRowPIN3["Date"] + " " + dataRowPIN3["Time"] + "." + dataRowPIN3["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port3SignalOut, dataRowPIN3["Date"] + " " + dataRowPIN3["Time"] + "." + dataRowPIN3["Milis"]);
             dataRowPIN3["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN3);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN3["Date"] + "," + dataRowPIN3["Time"] + "," + dataRowPIN3["Milis"] + "," + dataRowPIN3["Port"] + "," + dataRowPIN3["Dir"] + "," + dataRowPIN3["Data"] + "," + dataRowPIN3["Signal"] + "," + dataRowPIN3["Mark"] + "\r\n");
         }
 
-        private void checkBox_RTS4_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_RTS4_CheckedChanged(object sender, EventArgs e)
         {
             serialPort4.RtsEnable = checkBox_RTS4.Checked;
             DataRow dataRowPIN4 = null;
@@ -1631,13 +1649,13 @@ namespace RS232_monitor
                 o_rts4 = false;
                 outStr += "<" + portname4 + "_RTSv>";
             }
-            if (checkBox_insPin.Checked == true) collectBuffer(outStr, Port4SignalOut, dataRowPIN4["Date"] + " " + dataRowPIN4["Time"] + "." + dataRowPIN4["Milis"]);
+            if (checkBox_insPin.Checked == true) CollectBuffer(outStr, Port4SignalOut, dataRowPIN4["Date"] + " " + dataRowPIN4["Time"] + "." + dataRowPIN4["Milis"]);
             dataRowPIN4["Signal"] = outStr;
             if (logToGridToolStripMenuItem.Checked == true) CSVcollectGrid(dataRowPIN4);
             if (autosaveCSVToolStripMenuItem1.Checked == true) CSVcollectBuffer(dataRowPIN4["Date"] + "," + dataRowPIN4["Time"] + "," + dataRowPIN4["Milis"] + "," + dataRowPIN4["Port"] + "," + dataRowPIN4["Dir"] + "," + dataRowPIN4["Data"] + "," + dataRowPIN4["Signal"] + "," + dataRowPIN4["Mark"] + "\r\n");
         }
 
-        private void textBox_custom_command_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBox_custom_command_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (checkBox_commandhex.Checked == true)
             {
@@ -1649,7 +1667,7 @@ namespace RS232_monitor
             }
         }
 
-        private void textBox_params_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBox_params_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (checkBox_paramhex.Checked == true)
             {
@@ -1661,7 +1679,7 @@ namespace RS232_monitor
             }
         }
 
-        private void textBox_suff_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBox_suff_KeyPress(object sender, KeyPressEventArgs e)
         {
             char c = e.KeyChar;
             if (c != '\b' && !((c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f') || (c >= '0' && c <= '9') || c == 0x08 || c == ' '))
@@ -1670,25 +1688,25 @@ namespace RS232_monitor
             }
         }
 
-        private void checkBox_suff_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_suff_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox_suff.Checked == true) textBox_suff.Enabled = false;
             else textBox_suff.Enabled = true;
             SendStringCollect();
         }
 
-        private void button_Refresh_Click(object sender, EventArgs e)
+        private void Button_Refresh_Click(object sender, EventArgs e)
         {
             SerialPopulate();
         }
 
-        private void button_clear1_Click(object sender, EventArgs e)
+        private void Button_clear1_Click(object sender, EventArgs e)
         {
             textBox_terminal.Clear();
             CSVdataTable.Rows.Clear();
         }
 
-        private void comboBox_portname1_SelectedIndexChanged(object sender, EventArgs e)
+        private void ComboBox_portname1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox_portname1.SelectedIndex != 0 && comboBox_portname1.SelectedIndex == comboBox_portname2.SelectedIndex) comboBox_portname1.SelectedIndex = 0;
             if (comboBox_portname1.SelectedIndex != 0 && comboBox_portname1.SelectedIndex == comboBox_portname3.SelectedIndex) comboBox_portname1.SelectedIndex = 0;
@@ -1734,7 +1752,7 @@ namespace RS232_monitor
             else button_openport.Enabled = true;
         }
 
-        private void comboBox_portname2_SelectedIndexChanged(object sender, EventArgs e)
+        private void ComboBox_portname2_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox_portname2.SelectedIndex != 0 && comboBox_portname2.SelectedIndex == comboBox_portname1.SelectedIndex) comboBox_portname2.SelectedIndex = 0;
             if (comboBox_portname2.SelectedIndex != 0 && comboBox_portname2.SelectedIndex == comboBox_portname3.SelectedIndex) comboBox_portname2.SelectedIndex = 0;
@@ -1781,7 +1799,7 @@ namespace RS232_monitor
             else button_openport.Enabled = true;
         }
 
-        private void comboBox_portname3_SelectedIndexChanged(object sender, EventArgs e)
+        private void ComboBox_portname3_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox_portname3.SelectedIndex != 0 && comboBox_portname3.SelectedIndex == comboBox_portname1.SelectedIndex) comboBox_portname3.SelectedIndex = 0;
             if (comboBox_portname3.SelectedIndex != 0 && comboBox_portname3.SelectedIndex == comboBox_portname2.SelectedIndex) comboBox_portname3.SelectedIndex = 0;
@@ -1827,7 +1845,7 @@ namespace RS232_monitor
             else button_openport.Enabled = true;
         }
 
-        private void comboBox_portname4_SelectedIndexChanged(object sender, EventArgs e)
+        private void ComboBox_portname4_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox_portname4.SelectedIndex != 0 && comboBox_portname4.SelectedIndex == comboBox_portname1.SelectedIndex) comboBox_portname4.SelectedIndex = 0;
             if (comboBox_portname4.SelectedIndex != 0 && comboBox_portname4.SelectedIndex == comboBox_portname2.SelectedIndex) comboBox_portname4.SelectedIndex = 0;
@@ -1874,62 +1892,62 @@ namespace RS232_monitor
             else button_openport.Enabled = true;
         }
 
-        private void checkBox_commandhex_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_commandhex_CheckedChanged(object sender, EventArgs e)
         {
             string tmpstr = textBox_command.Text;
             if (checkBox_commandhex.Checked == true) textBox_command.Text = Accessory.ConvertStringToHex(tmpstr);
             else textBox_command.Text = Accessory.ConvertHexToString(tmpstr);
         }
 
-        private void checkBox_paramhex_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_paramhex_CheckedChanged(object sender, EventArgs e)
         {
             string tmpstr = textBox_params.Text;
             if (checkBox_paramhex.Checked == true) textBox_params.Text = Accessory.ConvertStringToHex(tmpstr);
             else textBox_params.Text = Accessory.ConvertHexToString(tmpstr);
         }
 
-        private void checkBox_send_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_send_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox_sendPort1.Checked == false && checkBox_sendPort2.Checked == false && checkBox_sendPort3.Checked == false && checkBox_sendPort4.Checked == false) button_send.Enabled = false;
             else if (serialPort1.IsOpen == true || serialPort2.IsOpen == true || serialPort3.IsOpen == true || serialPort4.IsOpen == true) button_send.Enabled = true;
         }
 
-        private void textBox_command_Leave(object sender, EventArgs e)
+        private void TextBox_command_Leave(object sender, EventArgs e)
         {
             if (checkBox_commandhex.Checked == true) textBox_command.Text = Accessory.CheckHexString(textBox_command.Text);
             SendStringCollect();
         }
 
-        private void textBox_params_Leave(object sender, EventArgs e)
+        private void TextBox_params_Leave(object sender, EventArgs e)
         {
             if (checkBox_paramhex.Checked == true) textBox_params.Text = Accessory.CheckHexString(textBox_params.Text);
             SendStringCollect();
         }
 
-        private void textBox_suff_Leave(object sender, EventArgs e)
+        private void TextBox_suff_Leave(object sender, EventArgs e)
         {
             if (checkBox_suffhex.Checked == true) textBox_suff.Text = Accessory.CheckHexString(textBox_suff.Text);
             SendStringCollect();
         }
 
-        private void checkBox_cr_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_cr_CheckedChanged(object sender, EventArgs e)
         {
             SendStringCollect();
         }
 
-        private void checkBox_lf_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_lf_CheckedChanged(object sender, EventArgs e)
         {
             SendStringCollect();
         }
 
-        private void checkBox_suffhex_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_suffhex_CheckedChanged(object sender, EventArgs e)
         {
             string tmpstr = textBox_suff.Text;
             if (checkBox_suffhex.Checked == true) textBox_suff.Text = Accessory.ConvertStringToHex(tmpstr);
             else textBox_suff.Text = Accessory.ConvertHexToString(tmpstr);
         }
 
-        private void checkBox_portName_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_portName_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox_portName.Checked == true)
             {
@@ -1974,7 +1992,7 @@ namespace RS232_monitor
             }
         }
 
-        private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
+        private void SaveFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
             if (saveFileDialog.Title == "Save .TXT log as...")
             {
@@ -2006,7 +2024,7 @@ namespace RS232_monitor
                 }
                 try
                 {
-                    File.WriteAllText(saveFileDialog.FileName, output, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
+                    File.WriteAllText(saveFileDialog.FileName, output, Encoding.GetEncoding(Properties.Settings.Default.CodePage));
                 }
                 catch (Exception ex)
                 {
@@ -2015,7 +2033,7 @@ namespace RS232_monitor
             }
         }
 
-        private void saveTXTToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveTXTToolStripMenuItem_Click(object sender, EventArgs e)
         {
             saveFileDialog.Title = "Save .TXT log as...";
             saveFileDialog.DefaultExt = "txt";
@@ -2024,7 +2042,7 @@ namespace RS232_monitor
             saveFileDialog.ShowDialog();
         }
 
-        private void saveCSVToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveCSVToolStripMenuItem_Click(object sender, EventArgs e)
         {
             saveFileDialog.Title = "Save .CSV log as...";
             saveFileDialog.DefaultExt = "csv";
@@ -2033,69 +2051,69 @@ namespace RS232_monitor
             saveFileDialog.ShowDialog();
         }
 
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show("RS232 Monitor\r\n(c) Kalugin Andrey\r\nContact: jekyll@mail.ru");
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
-        private void saveParametersToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void SaveParametersToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            RS232_monitor.Properties.Settings.Default.DefaultCommand = textBox_command.Text;
-            RS232_monitor.Properties.Settings.Default.DefaultCommandHex = checkBox_commandhex.Checked;
-            RS232_monitor.Properties.Settings.Default.DefaultParameter = textBox_params.Text;
-            RS232_monitor.Properties.Settings.Default.DefaultParamHex = checkBox_paramhex.Checked;
-            RS232_monitor.Properties.Settings.Default.addCR = checkBox_cr.Checked;
-            RS232_monitor.Properties.Settings.Default.addLF = checkBox_lf.Checked;
-            RS232_monitor.Properties.Settings.Default.addSuff = checkBox_suff.Checked;
-            RS232_monitor.Properties.Settings.Default.SuffText = textBox_suff.Text;
-            RS232_monitor.Properties.Settings.Default.DefaultSuffHex = checkBox_suffhex.Checked;
-            RS232_monitor.Properties.Settings.Default.LogSignal = checkBox_insPin.Checked;
-            RS232_monitor.Properties.Settings.Default.LogTime = checkBox_insTime.Checked;
-            RS232_monitor.Properties.Settings.Default.LogDir = checkBox_insDir.Checked;
-            RS232_monitor.Properties.Settings.Default.LogPortName = checkBox_portName.Checked;
-            RS232_monitor.Properties.Settings.Default.HexPort1 = checkBox_displayPort1hex.Checked;
-            RS232_monitor.Properties.Settings.Default.HexPort2 = checkBox_displayPort2hex.Checked;
-            RS232_monitor.Properties.Settings.Default.HexPort3 = checkBox_displayPort3hex.Checked;
-            RS232_monitor.Properties.Settings.Default.HexPort4 = checkBox_displayPort4hex.Checked;
-            RS232_monitor.Properties.Settings.Default.Port1Name = textBox_port1Name.Text;
-            RS232_monitor.Properties.Settings.Default.Port2Name = textBox_port2Name.Text;
-            RS232_monitor.Properties.Settings.Default.Port3Name = textBox_port3Name.Text;
-            RS232_monitor.Properties.Settings.Default.Port4Name = textBox_port4Name.Text;
-            RS232_monitor.Properties.Settings.Default.LogGrid = logToGridToolStripMenuItem.Checked;
-            RS232_monitor.Properties.Settings.Default.LogText = logToTextToolStripMenuItem.Checked;
-            RS232_monitor.Properties.Settings.Default.AutoScroll = autoscrollToolStripMenuItem.Checked;
-            RS232_monitor.Properties.Settings.Default.LineWrap = lineWrapToolStripMenuItem.Checked;
-            RS232_monitor.Properties.Settings.Default.AutoLogTXT = autosaveTXTToolStripMenuItem1.Checked;
-            RS232_monitor.Properties.Settings.Default.TXTlogFile = terminaltxtToolStripMenuItem1.Text;
-            RS232_monitor.Properties.Settings.Default.AutoLogCSV = autosaveCSVToolStripMenuItem1.Checked;
-            RS232_monitor.Properties.Settings.Default.LineBreakTimeout = limitTick / 10000;
-            RS232_monitor.Properties.Settings.Default.CSVLineNumber = CSVLineNumberLimit;
-            RS232_monitor.Properties.Settings.Default.Save();
+            Properties.Settings.Default.DefaultCommand = textBox_command.Text;
+            Properties.Settings.Default.DefaultCommandHex = checkBox_commandhex.Checked;
+            Properties.Settings.Default.DefaultParameter = textBox_params.Text;
+            Properties.Settings.Default.DefaultParamHex = checkBox_paramhex.Checked;
+            Properties.Settings.Default.addCR = checkBox_cr.Checked;
+            Properties.Settings.Default.addLF = checkBox_lf.Checked;
+            Properties.Settings.Default.addSuff = checkBox_suff.Checked;
+            Properties.Settings.Default.SuffText = textBox_suff.Text;
+            Properties.Settings.Default.DefaultSuffHex = checkBox_suffhex.Checked;
+            Properties.Settings.Default.LogSignal = checkBox_insPin.Checked;
+            Properties.Settings.Default.LogTime = checkBox_insTime.Checked;
+            Properties.Settings.Default.LogDir = checkBox_insDir.Checked;
+            Properties.Settings.Default.LogPortName = checkBox_portName.Checked;
+            Properties.Settings.Default.HexPort1 = checkBox_displayPort1hex.Checked;
+            Properties.Settings.Default.HexPort2 = checkBox_displayPort2hex.Checked;
+            Properties.Settings.Default.HexPort3 = checkBox_displayPort3hex.Checked;
+            Properties.Settings.Default.HexPort4 = checkBox_displayPort4hex.Checked;
+            Properties.Settings.Default.Port1Name = textBox_port1Name.Text;
+            Properties.Settings.Default.Port2Name = textBox_port2Name.Text;
+            Properties.Settings.Default.Port3Name = textBox_port3Name.Text;
+            Properties.Settings.Default.Port4Name = textBox_port4Name.Text;
+            Properties.Settings.Default.LogGrid = logToGridToolStripMenuItem.Checked;
+            Properties.Settings.Default.LogText = logToTextToolStripMenuItem.Checked;
+            Properties.Settings.Default.AutoScroll = autoscrollToolStripMenuItem.Checked;
+            Properties.Settings.Default.LineWrap = lineWrapToolStripMenuItem.Checked;
+            Properties.Settings.Default.AutoLogTXT = autosaveTXTToolStripMenuItem1.Checked;
+            Properties.Settings.Default.TXTlogFile = terminaltxtToolStripMenuItem1.Text;
+            Properties.Settings.Default.AutoLogCSV = autosaveCSVToolStripMenuItem1.Checked;
+            Properties.Settings.Default.LineBreakTimeout = limitTick / 10000;
+            Properties.Settings.Default.CSVLineNumber = CSVLineNumberLimit;
+            Properties.Settings.Default.Save();
         }
 
-        private void autosaveTXTToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void AutosaveTXTToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             autosaveTXTToolStripMenuItem1.Checked = !autosaveTXTToolStripMenuItem1.Checked;
             terminaltxtToolStripMenuItem1.Enabled = !autosaveTXTToolStripMenuItem1.Checked;
         }
 
-        private void lineWrapToolStripMenuItem_Click(object sender, EventArgs e)
+        private void LineWrapToolStripMenuItem_Click(object sender, EventArgs e)
         {
             lineWrapToolStripMenuItem.Checked = !lineWrapToolStripMenuItem.Checked;
             textBox_terminal.WordWrap = lineWrapToolStripMenuItem.Checked;
         }
 
-        private void autoscrollToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AutoscrollToolStripMenuItem_Click(object sender, EventArgs e)
         {
             autoscrollToolStripMenuItem.Checked = !autoscrollToolStripMenuItem.Checked;
         }
 
-        private void logToTextToolStripMenuItem_Click(object sender, EventArgs e)
+        private void LogToTextToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (logToTextToolStripMenuItem.Checked == true)
             {
@@ -2118,7 +2136,7 @@ namespace RS232_monitor
             }
         }
 
-        private void tabControl1_Selecting(object sender, TabControlCancelEventArgs e)
+        private void TabControl1_Selecting(object sender, TabControlCancelEventArgs e)
         {
             if (e.TabPage == tabPage1 && logToTextToolStripMenuItem.Checked == false)
                 e.Cancel = true;
@@ -2126,7 +2144,7 @@ namespace RS232_monitor
                 e.Cancel = true;
         }
 
-        private void logToGridToolStripMenuItem_Click(object sender, EventArgs e)
+        private void LogToGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (logToGridToolStripMenuItem.Checked == true)
             {
@@ -2149,37 +2167,37 @@ namespace RS232_monitor
             }
         }
 
-        private void checkBox_Mark_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_Mark_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox_Mark.Checked == true) checkBox_Mark.Font = new Font(checkBox_Mark.Font, FontStyle.Bold);
             else checkBox_Mark.Font = new Font(checkBox_Mark.Font, FontStyle.Regular);
         }
 
-        private void textBox_command_KeyUp(object sender, KeyEventArgs e)
+        private void TextBox_command_KeyUp(object sender, KeyEventArgs e)
         {
             if (button_send.Enabled == true)
                 if (e.KeyData == Keys.Return)
-                    button_send_Click(textBox_command, EventArgs.Empty);
+                    Button_send_Click(textBox_command, EventArgs.Empty);
         }
 
-        private void toolStripMenuItem_onlyData_Click(object sender, EventArgs e)
+        private void ToolStripMenuItem_onlyData_Click(object sender, EventArgs e)
         {
             toolStripMenuItem_onlyData.Checked = !toolStripMenuItem_onlyData.Checked;
 
             if (toolStripMenuItem_onlyData.Checked == false)
             {
-                serialPort1.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(serialPort1_ErrorReceived);
-                serialPort2.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(serialPort2_ErrorReceived);
-                serialPort3.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(serialPort3_ErrorReceived);
-                serialPort4.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(serialPort4_ErrorReceived);
+                serialPort1.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(SerialPort1_ErrorReceived);
+                serialPort2.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(SerialPort2_ErrorReceived);
+                serialPort3.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(SerialPort3_ErrorReceived);
+                serialPort4.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(SerialPort4_ErrorReceived);
                 checkBox_insPin.Checked = true;
             }
             else
             {
-                serialPort1.ErrorReceived -= serialPort1_ErrorReceived;
-                serialPort2.ErrorReceived -= serialPort2_ErrorReceived;
-                serialPort3.ErrorReceived -= serialPort3_ErrorReceived;
-                serialPort4.ErrorReceived -= serialPort4_ErrorReceived;
+                serialPort1.ErrorReceived -= SerialPort1_ErrorReceived;
+                serialPort2.ErrorReceived -= SerialPort2_ErrorReceived;
+                serialPort3.ErrorReceived -= SerialPort3_ErrorReceived;
+                serialPort4.ErrorReceived -= SerialPort4_ErrorReceived;
                 checkBox_insPin.Checked = false;
             }
         }
@@ -2319,7 +2337,7 @@ namespace RS232_monitor
 
             if (comboBox_portname1.SelectedIndex == 0 && comboBox_portname2.SelectedIndex == 0 && comboBox_portname3.SelectedIndex == 0 && comboBox_portname4.SelectedIndex == 0) button_openport.Enabled = false;
             else button_openport.Enabled = true;
-            checkBox_portName_CheckedChanged(this, EventArgs.Empty);
+            CheckBox_portName_CheckedChanged(this, EventArgs.Empty);
         }
 
         delegate void SetTextCallback1(string text);
@@ -2380,25 +2398,25 @@ namespace RS232_monitor
 
         private object threadLock = new object();
 
-        private void checkBox_insPin_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_insPin_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox_insPin.Checked == true)
             {
-                serialPort1.PinChanged += serialPort1_PinChanged;
-                serialPort2.PinChanged += serialPort2_PinChanged;
-                serialPort3.PinChanged += serialPort3_PinChanged;
-                serialPort4.PinChanged += serialPort4_PinChanged;
+                serialPort1.PinChanged += SerialPort1_PinChanged;
+                serialPort2.PinChanged += SerialPort2_PinChanged;
+                serialPort3.PinChanged += SerialPort3_PinChanged;
+                serialPort4.PinChanged += SerialPort4_PinChanged;
             }
             else
             {
-                serialPort1.PinChanged -= serialPort1_PinChanged;
-                serialPort2.PinChanged -= serialPort2_PinChanged;
-                serialPort3.PinChanged -= serialPort3_PinChanged;
-                serialPort4.PinChanged -= serialPort4_PinChanged;
+                serialPort1.PinChanged -= SerialPort1_PinChanged;
+                serialPort2.PinChanged -= SerialPort2_PinChanged;
+                serialPort3.PinChanged -= SerialPort3_PinChanged;
+                serialPort4.PinChanged -= SerialPort4_PinChanged;
             }
         }
 
-        private void toolStripTextBox_CSVLinesNumber_Leave(object sender, EventArgs e)
+        private void ToolStripTextBox_CSVLinesNumber_Leave(object sender, EventArgs e)
         {
             Int32.TryParse(toolStripTextBox_CSVLinesNumber.Text, out CSVLineNumberLimit);
             if (CSVLineNumberLimit < 1)
@@ -2412,14 +2430,15 @@ namespace RS232_monitor
         {
             long.TryParse(LineBreakToolStripTextBox1.Text, out limitTick);
             limitTick = limitTick * 10000;
+            LineBreakToolStripTextBox1.Text = (limitTick/10000).ToString();
         }
 
-        private void autosaveCSVToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void AutosaveCSVToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             autosaveCSVToolStripMenuItem1.Checked = !autosaveCSVToolStripMenuItem1.Checked;
         }
 
-        public void collectBuffer(string tmpBuffer, int state, string time)
+        public void CollectBuffer(string tmpBuffer, int state, string time)
         {
             if (tmpBuffer != "")
             {
@@ -2519,7 +2538,7 @@ namespace RS232_monitor
                     {
                         try
                         {
-                            File.AppendAllText(terminaltxtToolStripMenuItem1.Text, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
+                            File.AppendAllText(terminaltxtToolStripMenuItem1.Text, tmpBuffer, Encoding.GetEncoding(Properties.Settings.Default.CodePage));
                         }
                         catch (Exception ex)
                         {
@@ -2546,7 +2565,7 @@ namespace RS232_monitor
                     }
                     try
                     {
-                        File.AppendAllText(CSVFileName, tmpBuffer, Encoding.GetEncoding(RS232_monitor.Properties.Settings.Default.CodePage));
+                        File.AppendAllText(CSVFileName, tmpBuffer, Encoding.GetEncoding(Properties.Settings.Default.CodePage));
                         CSVLineCount++;
                     }
                     catch (Exception ex)
