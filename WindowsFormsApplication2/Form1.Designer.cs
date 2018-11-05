@@ -1132,7 +1132,7 @@ namespace RS232_monitor
             this.logToGridToolStripMenuItem.Checked = true;
             this.logToGridToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.logToGridToolStripMenuItem.Name = "logToGridToolStripMenuItem";
-            this.logToGridToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.logToGridToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.logToGridToolStripMenuItem.Text = "Log to table";
             this.logToGridToolStripMenuItem.Click += new System.EventHandler(this.LogToGridToolStripMenuItem_Click);
             // 
@@ -1141,14 +1141,14 @@ namespace RS232_monitor
             this.logToTextToolStripMenuItem.Checked = true;
             this.logToTextToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.logToTextToolStripMenuItem.Name = "logToTextToolStripMenuItem";
-            this.logToTextToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.logToTextToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.logToTextToolStripMenuItem.Text = "Log to text";
             this.logToTextToolStripMenuItem.Click += new System.EventHandler(this.LogToTextToolStripMenuItem_Click);
             // 
             // toolStripMenuItem_onlyData
             // 
             this.toolStripMenuItem_onlyData.Name = "toolStripMenuItem_onlyData";
-            this.toolStripMenuItem_onlyData.Size = new System.Drawing.Size(216, 22);
+            this.toolStripMenuItem_onlyData.Size = new System.Drawing.Size(200, 22);
             this.toolStripMenuItem_onlyData.Text = "No signal log";
             this.toolStripMenuItem_onlyData.Click += new System.EventHandler(this.ToolStripMenuItem_onlyData_Click);
             // 
@@ -1157,7 +1157,7 @@ namespace RS232_monitor
             this.autoscrollToolStripMenuItem.Checked = true;
             this.autoscrollToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.autoscrollToolStripMenuItem.Name = "autoscrollToolStripMenuItem";
-            this.autoscrollToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.autoscrollToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.autoscrollToolStripMenuItem.Text = "Autoscroll";
             this.autoscrollToolStripMenuItem.Click += new System.EventHandler(this.AutoscrollToolStripMenuItem_Click);
             // 
@@ -1166,7 +1166,7 @@ namespace RS232_monitor
             this.lineWrapToolStripMenuItem.Checked = true;
             this.lineWrapToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.lineWrapToolStripMenuItem.Name = "lineWrapToolStripMenuItem";
-            this.lineWrapToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.lineWrapToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.lineWrapToolStripMenuItem.Text = "Line wrap";
             this.lineWrapToolStripMenuItem.Click += new System.EventHandler(this.LineWrapToolStripMenuItem_Click);
             // 
@@ -1177,7 +1177,7 @@ namespace RS232_monitor
             this.autosaveTXTToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.terminaltxtToolStripMenuItem1});
             this.autosaveTXTToolStripMenuItem1.Name = "autosaveTXTToolStripMenuItem1";
-            this.autosaveTXTToolStripMenuItem1.Size = new System.Drawing.Size(216, 22);
+            this.autosaveTXTToolStripMenuItem1.Size = new System.Drawing.Size(200, 22);
             this.autosaveTXTToolStripMenuItem1.Text = "Autosave .TXT";
             this.autosaveTXTToolStripMenuItem1.Click += new System.EventHandler(this.AutosaveTXTToolStripMenuItem1_Click);
             // 
@@ -1193,7 +1193,7 @@ namespace RS232_monitor
             this.autosaveCSVToolStripMenuItem1.Checked = true;
             this.autosaveCSVToolStripMenuItem1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.autosaveCSVToolStripMenuItem1.Name = "autosaveCSVToolStripMenuItem1";
-            this.autosaveCSVToolStripMenuItem1.Size = new System.Drawing.Size(216, 22);
+            this.autosaveCSVToolStripMenuItem1.Size = new System.Drawing.Size(200, 22);
             this.autosaveCSVToolStripMenuItem1.Text = "Autosave .CSV";
             this.autosaveCSVToolStripMenuItem1.Click += new System.EventHandler(this.AutosaveCSVToolStripMenuItem1_Click);
             // 
@@ -1202,7 +1202,7 @@ namespace RS232_monitor
             this.LineBreakToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.LineBreakToolStripTextBox1});
             this.LineBreakToolStripMenuItem1.Name = "LineBreakToolStripMenuItem1";
-            this.LineBreakToolStripMenuItem1.Size = new System.Drawing.Size(216, 22);
+            this.LineBreakToolStripMenuItem1.Size = new System.Drawing.Size(200, 22);
             this.LineBreakToolStripMenuItem1.Text = "Line break timeout [ms]";
             // 
             // LineBreakToolStripTextBox1
@@ -1218,8 +1218,8 @@ namespace RS232_monitor
             this.limitCSVLinesNumberToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripTextBox_CSVLinesNumber});
             this.limitCSVLinesNumberToolStripMenuItem.Name = "limitCSVLinesNumberToolStripMenuItem";
-            this.limitCSVLinesNumberToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
-            this.limitCSVLinesNumberToolStripMenuItem.Text = "Limit CSV file lines number";
+            this.limitCSVLinesNumberToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.limitCSVLinesNumberToolStripMenuItem.Text = "Limit lines/CSV file";
             // 
             // toolStripTextBox_CSVLinesNumber
             // 
@@ -1232,7 +1232,7 @@ namespace RS232_monitor
             // saveParametersToolStripMenuItem1
             // 
             this.saveParametersToolStripMenuItem1.Name = "saveParametersToolStripMenuItem1";
-            this.saveParametersToolStripMenuItem1.Size = new System.Drawing.Size(216, 22);
+            this.saveParametersToolStripMenuItem1.Size = new System.Drawing.Size(200, 22);
             this.saveParametersToolStripMenuItem1.Text = "Save parameters";
             this.saveParametersToolStripMenuItem1.Click += new System.EventHandler(this.SaveParametersToolStripMenuItem1_Click);
             // 
