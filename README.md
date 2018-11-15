@@ -1,4 +1,8 @@
 # rs232_monitor
+
+Project is not maintained any more due to a new project released instead: rs232_monitor2 (https://github.com/jekyll2014/rs232_monitor2)
+
+
 Collect COM ports (up to 4) data into 1 readable file for analyzing
 
 Software intended for support engineers who needs to collect several data flows into a timed database to analyse the process flow.
